@@ -5,49 +5,50 @@
     class="flex flex-col justify-center w-96 gap-1 p-6 input"
   >
     <label for="name">ชื่อจริง</label>
-    <input v-model="name" type="text" id="name" required />
+    <input v-model="formData.name" type="text" id="name" required />
 
     <label for="surname">นามสกุล</label>
-    <input v-model="surname" type="text" id="surname" required />
+    <input v-model="formData.surname" type="text" id="surname" required />
 
     <label for="date_of_birth">วัน เดือน ปีเกิด</label>
     <!-- Use a date picker for date_of_birth -->
-    <input v-model="date_of_birth" type="date" id="date_of_birth" required />
+    <input v-model="formData.date_of_birth" type="date" id="date_of_birth" required />
 
     <label for="email">อีเมล์</label>
-    <input v-model="email" type="email" id="email" required />
+    <input v-model="formData.email" type="email" id="email" required />
 
     <label for="phone">เบอร์โทรศัพท์</label>
-    <input v-model.number="phone" type="number" id="phone" required />
+    <input v-model.number="formData.phone" type="number" id="phone" required />
 
     <label for="address">ที่อยู่</label>
-    <input v-model="address" type="text" id="address" required />
+    <input v-model="formData.address" type="text" id="address" required />
 
     <label for="province">จังหวัด</label>
-    <input v-model="province" type="text" id="province" required />
+    <input v-model="formData.province" type="text" id="province" required />
 
     <label for="state">แขวง</label>
-    <input v-model="state" type="text" id="state" required />
+    <input v-model="formData.state" type="text" id="state" required />
 
     <label for="gender">เพศ</label>
     <!-- Use a dropdown for gender with fixed options -->
-    <select v-model="gender" id="gender" required>
+    <select v-model="formData.gender" id="gender" required>
       <option value="male">ชาย</option>
       <option value="female">หญิง</option>
       <option value="other">อื่น ๆ</option>
     </select>
 
     <button
+    :disabled="loading"
       class="bg-blue-500 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-2 px-4 rounded mt-2"
       type="submit"
     >
-      ยืนยัน
+      {{  loading? 'Loading...' : 'ยืนยัน' }}
     </button>
 
     <span v-if="loading" class="spinner"></span>
     <span v-else></span>
 
-    <div v-if="resultMsg" colass="result-box">
+    <div v-if="resultMsg" class="result-box">
       {{ resultMsg }}
     </div>
   </form>
@@ -76,6 +77,7 @@ const submitRegistration = async () => {
   loading.value = true;
   resultMsg.value = "";
   try {
+    console.log("Sending date:", formData.value);
     const response = await fetch("http://localhost:8080/api/register", {
       method: "POST",
       headers: {
@@ -94,7 +96,7 @@ const submitRegistration = async () => {
     }
   } catch (error) {
     // Handle any errors
-    console.error("Registration failed:", error);
+    console.error("Registration failed:", error.statusText);
   } finally {
     loading.value = false;
   }
@@ -150,5 +152,14 @@ const submitRegistration = async () => {
   100% {
     transform: rotate(360deg);
   }
+}
+
+label{
+  color: white;
+}
+
+input,
+select {
+  color: slateblue;
 }
 </style>

@@ -1,11 +1,7 @@
 <template>
-  <div class="bg-slate-950 h-screen text-white">
+  <div class="bg-slate-950 min-h-screen">
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
   </div>
 </template>
-
-<script setup>
-import index from './pages/register.vue';
-</script>

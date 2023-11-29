@@ -1,13 +1,13 @@
 <template>
   <title>SWU CLINIC</title>
-  <div class="flex flex-col justify-center items-center">
+  <div class="p-reg flex flex-col justify-center items-center">
     <Banner />
     <RegistrationForm />
   </div>
 </template>
 
-<!-- <style>
-body{
-  background-color: ;
+<style>
+.p-reg {
+  min-height: 100svh;
 }
-</style> -->
+</style>

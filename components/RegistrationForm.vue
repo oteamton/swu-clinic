@@ -239,13 +239,15 @@ const submitRegistration = async () => {
 }
 
 label {
-  color: white;
+  color: #fff;
 }
 
 input,
 select {
   text-indent: 5px;
   border-radius: 6px;
-  color: slateblue;
+  border: 1px solid #fff;
+  color: #fff;
+  background-color: #333;
 }
 </style>

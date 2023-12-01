@@ -50,8 +50,8 @@
     <div v-if="currStep === 2" class="flex flex-col">
       <label for="phone">เบอร์โทรศัพท์</label>
       <input
-        v-model.number="formData.phone"
-        type="number"
+        v-model="formData.phone"
+        type="text"
         id="phone"
         required
       />

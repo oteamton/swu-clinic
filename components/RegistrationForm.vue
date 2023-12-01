@@ -9,8 +9,16 @@
     @submit.prevent="submitRegistration"
     class="flex flex-col justify-center w-96 gap-1 p-6 input"
   >
-    <!-- หน้าแรก -->
+    <!-- page 1 -->
     <div v-if="currStep === 1" class="flex flex-col">
+      <label for="gender">เพศ</label>
+      <!-- Use a dropdown for gender with fixed options -->
+      <select v-model="formData.gender" id="gender" required>
+        <option value="ชาย">ชาย</option>
+        <option value="หญิง">หญิง</option>
+        <option value="อื่นๆ">อื่นๆ</option>
+      </select>
+
       <label for="name">ชื่อจริง</label>
       <input v-model="formData.name" type="text" id="name" required />
 
@@ -26,13 +34,7 @@
         required
       />
 
-      <label for="gender">เพศ</label>
-      <!-- Use a dropdown for gender with fixed options -->
-      <select v-model="formData.gender" id="gender" required>
-        <option value="ชาย">ชาย</option>
-        <option value="หญิง">หญิง</option>
-        <option value="อื่นๆ">อื่นๆ</option>
-      </select>
+      
 
       <label for="email">อีเมล์</label>
       <input v-model="formData.email" type="email" id="email" required />
@@ -46,7 +48,7 @@
       </button>
     </div>
 
-    <!-- หน้าสอง -->
+    <!-- page 2 -->
     <div v-if="currStep === 2" class="flex flex-col">
       <label for="phone">เบอร์โทรศัพท์</label>
       <input

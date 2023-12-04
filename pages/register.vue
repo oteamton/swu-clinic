@@ -1,5 +1,5 @@
 <template>
-  <title>SWU CLINIC</title>
+  <title>ลงทะเบียน - SWU CLINIC</title>
   <div class="p-reg flex flex-col justify-center items-center">
     <Banner />
     <RegistrationForm />

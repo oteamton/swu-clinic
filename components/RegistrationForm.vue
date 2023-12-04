@@ -1,18 +1,22 @@
 <template>
   <h2 class="text-4xl text-center mb-4 text-white">ลงทะเบียน</h2>
-  <div class="breadcrumbs flex">
-    <span class="bg-green-700 p-2" @click="currStep = 1">ส่วนที่ 1</span>
-    <span class="bg-green-700 p-2" @click="currStep = 2">ส่วนที่ 2</span>
+  <div class="breadcrumb flex gap-1">
+    <a href="#" class="bg-green-700 p-4 text-white" @click="currStep = 1"
+      >ส่วนที่ 1</a
+    >
+    <a href="#" class="bg-green-700 p-4 text-white" @click="currStep = 2"
+      >ส่วนที่ 2</a
+    >
   </div>
 
   <form
     @submit.prevent="submitRegistration"
-    class="flex flex-col justify-center w-96 gap-1 p-6 input"
+    class="flex flex-col justify-center w-96 gap-1 p-4 input"
   >
     <!-- page 1 -->
-    <div v-if="currStep === 1" class="flex flex-col">
+    <div v-if="currStep === 1" class="flex flex-col gap-4">
       <label for="gender">เพศ</label>
-      <div id="gender">
+      <div id="gender" class="flex gap-2">
         <label>
           <input type="radio" v-model="formData.gender" value="ชาย" />
           ชาย
@@ -48,14 +52,15 @@
       <button
         type="button"
         @click="NextPage"
-        class="bg-blue-500 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-2 px-4 rounded mt-2"
+        class="bg-blue-500 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-2 px-4 rounded mt-4 max-w-fit
+        self-center"
       >
         หน้าถัดไป
       </button>
     </div>
 
     <!-- page 2 -->
-    <div v-if="currStep === 2" class="flex flex-col">
+    <div v-if="currStep === 2" class="flex flex-col gap-4 mb-4">
       <label for="phone">เบอร์โทรศัพท์</label>
       <input v-model="formData.phone" type="text" id="phone" required />
 
@@ -67,27 +72,28 @@
 
       <label for="state">แขวง</label>
       <input v-model="formData.state" type="text" id="state" required />
-
-      <button
+    </div>
+    <div v-if="currStep === 2" class="flex justify-center gap-2 ">
+      <!-- <button
         type="button"
         @click="currStep = 1"
         class="bg-gray-500 hover:bg-gray-700 active:bg-gray-800 text-white font-bold py-2 px-4 rounded mt-2"
       >
         ย้อนกลับ
+      </button> -->
+      <button
+        :disabled="loading"
+        class="bg-blue-500 hover:bg-blue-700 active:bg-blue-800 active:scale-90 text-white font-bold py-2 px-4 rounded mt-2"
+        type="submit"
+      >
+        {{ loading ? "กำลังดำเนินการ..." : "ยืนยัน" }}
       </button>
       <button
         type="button"
         @click="cancelForm"
-        class="bg-red-500 hover:bg-red-700 active:bg-red-800 text-white font-bold py-2 px-4 rounded mt-2"
+        class="bg-red-500 hover:bg-red-700 active:bg-red-800 active:scale-90 text-white font-bold py-2 px-4 rounded mt-2"
       >
         ยกเลิก
-      </button>
-      <button
-        :disabled="loading"
-        class="bg-blue-500 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-2 px-4 rounded mt-2"
-        type="submit"
-      >
-        {{ loading ? "กำลังดำเนินการ..." : "ยืนยัน" }}
       </button>
     </div>
 
@@ -142,17 +148,19 @@ const submitRegistration = async () => {
       body: JSON.stringify(formData.value),
     });
 
+    const responseDate = await response.json();
+
     if (response.ok) {
       const data = await response.json();
       resultMsg.value = "Registration successful";
-      console.log("Registration successful:", data);
+      console.log("Registration successful:", responseDate);
     } else {
-      resultMsg.value = `Registration failed: ${response.statusText}`;
-      console.error("Registration failed:", response.statusText);
+      resultMsg.value = `Registration failed: ${responseDate.error || response.error}`;
+      console.error("Registration failed:", responseData.error || response.statusText);
     }
   } catch (error) {
     // Handle any errors
-    console.error("Registration failed:", error.statusText);
+    console.error("Registration failed:", error.message);
   } finally {
     loading.value = false;
   }
@@ -160,9 +168,26 @@ const submitRegistration = async () => {
 </script>
 
 <style>
-.breadcrumbs {
-  color: #fff;
+template {
+  font-family: "Kanit", sans-serif;
+}
+.breadcrumb a:hover {
   cursor: pointer;
+  background-color: lightgreen;
+}
+
+.breadcrumb a:active {
+  scale: 0.9;
+}
+
+.breadcrumb a:nth-child(1) {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.breadcrumb a:nth-child(2) {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 .result-box {

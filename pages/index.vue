@@ -1,5 +1,5 @@
 <template>
-  <title>Welcome to SWU CLINIC</title>
+  <title>ยินดีตอนรับ - SWU CLINIC</title>
   <div class="welcome flex flex-col justify-center items-center">
     <NuxtLink to="/register"
       ><button class="bg-red-700 p-2 rounded">Register</button>
@@ -9,6 +9,6 @@
 
 <style>
 .welcome {
-  height: 100dvh;
+  height: 100svh;
 }
 </style>

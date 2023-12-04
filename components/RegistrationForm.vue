@@ -1,8 +1,8 @@
 <template>
   <h2 class="text-4xl text-center mb-4 text-white">ลงทะเบียน</h2>
-  <div class="breadcrumb flex gap-2">
-    <span class="bg-green-700 p-2 rounded" @click="currStep = 1">หน้าแรก</span>
-    <span class="bg-green-700 p-2 rounded" @click="currStep = 2">หน้าสอง</span>
+  <div class="breadcrumbs flex">
+    <span class="bg-green-700 p-2" @click="currStep = 1">ส่วนที่ 1</span>
+    <span class="bg-green-700 p-2" @click="currStep = 2">ส่วนที่ 2</span>
   </div>
 
   <form
@@ -12,12 +12,20 @@
     <!-- page 1 -->
     <div v-if="currStep === 1" class="flex flex-col">
       <label for="gender">เพศ</label>
-      <!-- Use a dropdown for gender with fixed options -->
-      <select v-model="formData.gender" id="gender" required>
-        <option value="ชาย">ชาย</option>
-        <option value="หญิง">หญิง</option>
-        <option value="อื่นๆ">อื่นๆ</option>
-      </select>
+      <div id="gender">
+        <label>
+          <input type="radio" v-model="formData.gender" value="ชาย" />
+          ชาย
+        </label>
+        <label>
+          <input type="radio" v-model="formData.gender" value="หญิง" />
+          หญิง
+        </label>
+        <label>
+          <input type="radio" v-model="formData.gender" value="อื่นๆ" />
+          อื่นๆ
+        </label>
+      </div>
 
       <label for="name">ชื่อจริง</label>
       <input v-model="formData.name" type="text" id="name" required />
@@ -34,8 +42,6 @@
         required
       />
 
-      
-
       <label for="email">อีเมล์</label>
       <input v-model="formData.email" type="email" id="email" required />
 
@@ -51,12 +57,7 @@
     <!-- page 2 -->
     <div v-if="currStep === 2" class="flex flex-col">
       <label for="phone">เบอร์โทรศัพท์</label>
-      <input
-        v-model="formData.phone"
-        type="text"
-        id="phone"
-        required
-      />
+      <input v-model="formData.phone" type="text" id="phone" required />
 
       <label for="address">ที่อยู่</label>
       <input v-model="formData.address" type="text" id="address" required />
@@ -159,7 +160,7 @@ const submitRegistration = async () => {
 </script>
 
 <style>
-.breadcrumb {
+.breadcrumbs {
   color: #fff;
   cursor: pointer;
 }

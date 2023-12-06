@@ -16,7 +16,7 @@
     <!-- page 1 -->
     <div v-if="currStep === 1" class="flex flex-col gap-4">
       <label for="gender">เพศ</label>
-      <div id="gender" class="flex gap-2">
+      <div id="gender" class="flex gap-2 border-white border-2 p-2">
         <label>
           <input type="radio" v-model="formData.gender" value="ชาย" />
           ชาย
@@ -50,10 +50,15 @@
       <input v-model="formData.email" type="email" id="email" required />
 
       <button
+        :disabled="!allFieldsFilled"
+        :class="{
+          'bg-gray-500': !allFieldsFilled,
+          'bg-blue-500 hover:bg-blue-700 active:bg-blue-800':
+          allFieldsFilled,
+        }"
         type="button"
         @click="NextPage"
-        class="bg-blue-500 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-2 px-4 rounded mt-4 max-w-fit
-        self-center"
+        class=" text-white font-bold py-2 px-4 rounded mt-4 max-w-fit self-center"
       >
         หน้าถัดไป
       </button>
@@ -73,7 +78,7 @@
       <label for="state">แขวง</label>
       <input v-model="formData.state" type="text" id="state" required />
     </div>
-    <div v-if="currStep === 2" class="flex justify-center gap-2 ">
+    <div v-if="currStep === 2" class="flex justify-center gap-2">
       <!-- <button
         type="button"
         @click="currStep = 1"
@@ -97,7 +102,7 @@
       </button>
     </div>
 
-    <span v-if="loading" class="spinner"></span>
+    <span v-if="loading" class="spinner self-center"></span>
     <span v-else></span>
     <div v-if="resultMsg" class="overlay"></div>
     <div v-if="resultMsg" class="result-box">
@@ -108,8 +113,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-// import { useHttp } from '@nuxt/http';
+import { ref, computed } from "vue";
 const currStep = ref(1);
 
 const NextPage = () => {
@@ -130,6 +134,15 @@ const formData = ref({
   province: "",
   state: "",
   gender: "",
+});
+
+const fieldsValidation = computed(() => {
+  // Check if all fields are not empty
+  const allFieldsFilled = Object.values(formData.value).every(
+    (value) => value !== "" && value !== null && value !== undefined
+  );
+
+  return allFieldsFilled;
 });
 
 const loading = ref(false);
@@ -155,8 +168,13 @@ const submitRegistration = async () => {
       resultMsg.value = "Registration successful";
       console.log("Registration successful:", responseDate);
     } else {
-      resultMsg.value = `Registration failed: ${responseDate.error || response.error}`;
-      console.error("Registration failed:", responseData.error || response.statusText);
+      resultMsg.value = `Registration failed: ${
+        responseDate.error || response.error
+      }`;
+      console.error(
+        "Registration failed:",
+        responseData.error || response.statusText
+      );
     }
   } catch (error) {
     // Handle any errors

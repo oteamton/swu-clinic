@@ -1,10 +1,18 @@
 <template>
   <h2 class="text-4xl text-center mb-4 text-white">ลงทะเบียน</h2>
   <div class="breadcrumb flex gap-1">
-    <a href="#" class="bg-green-700 p-4 text-white" @click="currStep = 1"
+    <a
+      href="#"
+      class="bg-green-700 p-4 text-white"
+      @click="currStep = 1"
+      :class="{ 'border-white border-2': currStep === 1 }"
       >ส่วนที่ 1</a
     >
-    <a href="#" class="bg-green-700 p-4 text-white" @click="currStep = 2"
+    <a
+      href="#"
+      class="bg-green-700 p-4 text-white"
+      @click="currStep = 2"
+      :class="{ 'border-white border-2': currStep === 2 }"
       >ส่วนที่ 2</a
     >
   </div>
@@ -14,9 +22,13 @@
     class="flex flex-col justify-center w-96 gap-1 p-4 input"
   >
     <!-- page 1 -->
-    <div v-if="currStep === 1" class="flex flex-col gap-4">
+    <div v-if="currStep === 1" class="flex flex-col gap-2">
       <label for="gender">เพศ</label>
-      <div id="gender" class="flex gap-2 border-white border-2 p-2">
+      <div
+        id="gender"
+        class="flex gap-2 border-orange-300 border-2 p-2"
+        :class="{ 'border-none': isGenderSelected }"
+      >
         <label>
           <input type="radio" v-model="formData.gender" value="ชาย" />
           ชาย
@@ -33,9 +45,15 @@
 
       <label for="name">ชื่อจริง</label>
       <input v-model="formData.name" type="text" id="name" required />
+      <span class="text-orange-300" v-if="!isNameValid"
+        >Please enter at least 4 characters</span
+      >
 
       <label for="surname">นามสกุล</label>
       <input v-model="formData.surname" type="text" id="surname" required />
+      <span class="text-orange-300" v-if="!isSurnameValid"
+        >Please enter at least 4 characters</span
+      >
 
       <label for="date_of_birth">วัน เดือน ปีเกิด</label>
       <!-- Use a date picker for date_of_birth -->
@@ -45,50 +63,63 @@
         id="date_of_birth"
         required
       />
-
-      <label for="email">อีเมล์</label>
-      <input v-model="formData.email" type="email" id="email" required />
+      <span class="text-orange-300" v-if="!isDateofBirthSelected"
+        >Please select a date</span
+      >
+      <label for="phone">เบอร์โทรศัพท์</label>
+      <input v-model="formData.phone" type="text" id="phone" required />
+      <span class="text-orange-300" v-if="!isPhoneValid"
+        >Please enter valid phone</span
+      >
 
       <button
-        :disabled="!allFieldsFilled"
+        :disabled="!firstPageValid"
         :class="{
-          'bg-gray-500': !allFieldsFilled,
-          'bg-blue-500 hover:bg-blue-700 active:bg-blue-800':
-          allFieldsFilled,
+          'bg-gray-500': !firstPageValid,
+          'bg-blue-500 hover:bg-blue-700 active:bg-blue-800': firstPageValid,
         }"
         type="button"
         @click="NextPage"
-        class=" text-white font-bold py-2 px-4 rounded mt-4 max-w-fit self-center"
+        class="text-white font-bold py-2 px-4 rounded mt-4 max-w-fit self-center"
       >
         หน้าถัดไป
       </button>
     </div>
 
     <!-- page 2 -->
-    <div v-if="currStep === 2" class="flex flex-col gap-4 mb-4">
-      <label for="phone">เบอร์โทรศัพท์</label>
-      <input v-model="formData.phone" type="text" id="phone" required />
+    <div v-if="currStep === 2" class="flex flex-col gap-2 mb-4">
+      <label for="email">อีเมล์</label>
+      <input v-model="formData.email" type="email" id="email" required />
+      <span class="text-orange-300" v-if="!isEmailValid"
+        >Please enter valid email</span
+      >
 
       <label for="address">ที่อยู่</label>
       <input v-model="formData.address" type="text" id="address" required />
+      <span class="text-orange-300" v-if="!isEmailValid"
+        >Please enter address</span
+      >
 
       <label for="province">จังหวัด</label>
       <input v-model="formData.province" type="text" id="province" required />
+      <span class="text-orange-300" v-if="!isEmailValid"
+        >Please enter province</span
+      >
 
       <label for="state">แขวง</label>
       <input v-model="formData.state" type="text" id="state" required />
+      <span class="text-orange-300" v-if="!isEmailValid"
+        >Please enter state</span
+      >
     </div>
     <div v-if="currStep === 2" class="flex justify-center gap-2">
-      <!-- <button
-        type="button"
-        @click="currStep = 1"
-        class="bg-gray-500 hover:bg-gray-700 active:bg-gray-800 text-white font-bold py-2 px-4 rounded mt-2"
-      >
-        ย้อนกลับ
-      </button> -->
       <button
-        :disabled="loading"
-        class="bg-blue-500 hover:bg-blue-700 active:bg-blue-800 active:scale-90 text-white font-bold py-2 px-4 rounded mt-2"
+        :disabled="!secondPageValid"
+        :class="{
+          'bg-gray-500': !secondPageValid,
+          'bg-blue-500 hover:bg-blue-700 active:bg-blue-800 active:scale-90': secondPageValid,
+        }"
+        class="text-white font-bold py-2 px-4 rounded mt-2"
         type="submit"
       >
         {{ loading ? "กำลังดำเนินการ..." : "ยืนยัน" }}
@@ -115,9 +146,17 @@
 <script setup>
 import { ref, computed } from "vue";
 const currStep = ref(1);
+const loading = ref(false);
+const resultMsg = ref("");
+const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+const nameRegex = /^[A-Za-z\u0E00-\u0E7F]+$/;
+const phoneRegex = /^[0-9]+$/;
+const addressRegex = /^[A-Za-z\u0E00-\u0E7F0-9\s]+$/;
 
 const NextPage = () => {
-  currStep.value++;
+  if (firstPageValid.value) {
+    currStep.value++;
+  }
 };
 
 const cancelForm = () => {
@@ -136,17 +175,65 @@ const formData = ref({
   gender: "",
 });
 
-const fieldsValidation = computed(() => {
-  // Check if all fields are not empty
-  const allFieldsFilled = Object.values(formData.value).every(
-    (value) => value !== "" && value !== null && value !== undefined
-  );
-
-  return allFieldsFilled;
+// Valid function
+const isNameValid = computed(() => {
+  return nameRegex.test(formData.value.name) && formData.value.name.length >= 4;
 });
 
-const loading = ref(false);
-const resultMsg = ref("");
+const isSurnameValid = computed(() => {
+  return (
+    nameRegex.test(formData.value.surname) && formData.value.surname.length >= 4
+  );
+});
+
+const isEmailValid = computed(() => {
+  return emailRegex.test(formData.value.email);
+});
+
+const isGenderSelected = computed(() => {
+  return formData.value.gender !== "";
+});
+
+const isDateofBirthSelected = computed(() => {
+  return formData.value.date_of_birth !== "";
+});
+
+const isPhoneValid = computed(() => {
+  return (
+    phoneRegex.test(formData.value.phone) && formData.value.phone.length == 10
+  );
+});
+
+const isAddressValid = computed(() => {
+  return addressRegex.test(formData.value.address);
+});
+
+const isStateValid = computed(() => {
+  return addressRegex.test(formData.value.state);
+})
+
+const isProvinceValid = computed(() => {
+  return addressRegex.test(formData.value.province);
+})
+
+const firstPageValid = computed(() => {
+  if(isPhoneValid.value && isNameValid.value && isSurnameValid.value && isDateofBirthSelected.value && isGenderSelected.value == true) {
+    return true;
+  }else{
+    return false;
+  }
+});
+
+const secondPageValid = computed(() => {
+  if(isProvinceValid.value && isStateValid.value && isAddressValid.value && isEmailValid.value == true) {
+    return true;
+  }else{
+    return false;
+  }
+});
+
+// console.log(isGenderSelected.value, isDateofBirthSelected.value, isPhoneValid.value, isNameValid.value, isSurnameValid.value)
+// console.log(firstPageValid.value)
 
 const submitRegistration = async () => {
   loading.value = true;
@@ -189,6 +276,7 @@ const submitRegistration = async () => {
 template {
   font-family: "Kanit", sans-serif;
 }
+
 .breadcrumb a:hover {
   cursor: pointer;
   background-color: lightgreen;

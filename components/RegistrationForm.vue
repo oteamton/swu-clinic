@@ -1,34 +1,18 @@
-<template>
+6<template>
   <h2 class="text-4xl text-center mb-4 text-white">ลงทะเบียน</h2>
   <div class="breadcrumb flex gap-1">
-    <a
-      href="#"
-      class="bg-green-700 p-4 text-white"
-      @click="currStep = 1"
-      :class="{ 'border-white border-2': currStep === 1 }"
-      >ส่วนที่ 1</a
-    >
-    <a
-      href="#"
-      class="bg-green-700 p-4 text-white"
-      @click="currStep = 2"
-      :class="{ 'border-white border-2': currStep === 2 }"
-      >ส่วนที่ 2</a
-    >
+    <a href="#" class="bg-green-700 p-4 text-white" @click="currStep = 1"
+      :class="{ 'border-white border-2': currStep === 1 }">ส่วนที่ 1</a>
+    <a href="#" class="bg-green-700 p-4 text-white"
+      :class="{ 'disabled-link': !firstPageValid, 'border-white border-2': currStep === 2 }"
+      @click="firstPageValid ? currStep = 2 : $event.preventDefault()">ส่วนที่ 2</a>
   </div>
 
-  <form
-    @submit.prevent="submitRegistration"
-    class="flex flex-col justify-center w-96 gap-1 p-4 input"
-  >
+  <form @submit.prevent="submitRegistration" class="flex flex-col justify-center w-96 gap-1 p-4 input">
     <!-- page 1 -->
     <div v-if="currStep === 1" class="flex flex-col gap-2">
       <label for="gender">เพศ</label>
-      <div
-        id="gender"
-        class="flex gap-2 border-orange-300 border-2 p-2"
-        :class="{ 'border-none': isGenderSelected }"
-      >
+      <div id="gender" class="flex gap-2 border-orange-300 border-2 p-2" :class="{ 'border-none': isGenderSelected }">
         <label>
           <input type="radio" v-model="formData.gender" value="ชาย" />
           ชาย
@@ -45,43 +29,24 @@
 
       <label for="name">ชื่อจริง</label>
       <input v-model="formData.name" type="text" id="name" required />
-      <span class="text-orange-300" v-if="!isNameValid"
-        >Please enter at least 4 characters</span
-      >
+      <span class="text-orange-300" v-if="!isNameValid">Please enter at least 4 characters</span>
 
       <label for="surname">นามสกุล</label>
       <input v-model="formData.surname" type="text" id="surname" required />
-      <span class="text-orange-300" v-if="!isSurnameValid"
-        >Please enter at least 4 characters</span
-      >
+      <span class="text-orange-300" v-if="!isSurnameValid">Please enter at least 4 characters</span>
 
       <label for="date_of_birth">วัน เดือน ปีเกิด</label>
       <!-- Use a date picker for date_of_birth -->
-      <input
-        v-model="formData.date_of_birth"
-        type="date"
-        id="date_of_birth"
-        required
-      />
-      <span class="text-orange-300" v-if="!isDateofBirthSelected"
-        >Please select a date</span
-      >
+      <input v-model="formData.date_of_birth" type="date" id="date_of_birth" required />
+      <span class="text-orange-300" v-if="!isDateofBirthSelected">Please select a date</span>
       <label for="phone">เบอร์โทรศัพท์</label>
       <input v-model="formData.phone" type="text" id="phone" required />
-      <span class="text-orange-300" v-if="!isPhoneValid"
-        >Please enter valid phone</span
-      >
+      <span class="text-orange-300" v-if="!isPhoneValid">Please enter valid phone</span>
 
-      <button
-        :disabled="!firstPageValid"
-        :class="{
-          'bg-gray-500': !firstPageValid,
-          'bg-blue-500 hover:bg-blue-700 active:bg-blue-800': firstPageValid,
-        }"
-        type="button"
-        @click="NextPage"
-        class="text-white font-bold py-2 px-4 rounded mt-4 max-w-fit self-center"
-      >
+      <button :disabled="!firstPageValid" :class="{
+        'bg-gray-500': !firstPageValid,
+        'bg-blue-500 hover:bg-blue-700 active:bg-blue-800': firstPageValid,
+      }" type="button" @click="NextPage" class="text-white font-bold py-2 px-4 rounded mt-4 max-w-fit self-center">
         หน้าถัดไป
       </button>
     </div>
@@ -90,45 +55,29 @@
     <div v-if="currStep === 2" class="flex flex-col gap-2 mb-4">
       <label for="email">อีเมล์</label>
       <input v-model="formData.email" type="email" id="email" required />
-      <span class="text-orange-300" v-if="!isEmailValid"
-        >Please enter valid email</span
-      >
+      <span class="text-orange-300" v-if="!isEmailValid">Please enter valid email</span>
 
       <label for="address">ที่อยู่</label>
       <input v-model="formData.address" type="text" id="address" required />
-      <span class="text-orange-300" v-if="!isEmailValid"
-        >Please enter address</span
-      >
+      <span class="text-orange-300" v-if="!isEmailValid">Please enter address</span>
 
       <label for="province">จังหวัด</label>
       <input v-model="formData.province" type="text" id="province" required />
-      <span class="text-orange-300" v-if="!isEmailValid"
-        >Please enter province</span
-      >
+      <span class="text-orange-300" v-if="!isEmailValid">Please enter province</span>
 
       <label for="state">แขวง</label>
       <input v-model="formData.state" type="text" id="state" required />
-      <span class="text-orange-300" v-if="!isEmailValid"
-        >Please enter state</span
-      >
+      <span class="text-orange-300" v-if="!isEmailValid">Please enter state</span>
     </div>
     <div v-if="currStep === 2" class="flex justify-center gap-2">
-      <button
-        :disabled="!secondPageValid"
-        :class="{
-          'bg-gray-500': !secondPageValid,
-          'bg-blue-500 hover:bg-blue-700 active:bg-blue-800 active:scale-90': secondPageValid,
-        }"
-        class="text-white font-bold py-2 px-4 rounded mt-2"
-        type="submit"
-      >
+      <button :disabled="!secondPageValid" :class="{
+        'bg-gray-500': !secondPageValid,
+        'bg-blue-500 hover:bg-blue-700 active:bg-blue-800 active:scale-90': secondPageValid,
+      }" class="text-white font-bold py-2 px-4 rounded mt-2" type="submit">
         {{ loading ? "กำลังดำเนินการ..." : "ยืนยัน" }}
       </button>
-      <button
-        type="button"
-        @click="cancelForm"
-        class="bg-red-500 hover:bg-red-700 active:bg-red-800 active:scale-90 text-white font-bold py-2 px-4 rounded mt-2"
-      >
+      <button type="button" @click="cancelForm"
+        class="bg-red-500 hover:bg-red-700 active:bg-red-800 active:scale-90 text-white font-bold py-2 px-4 rounded mt-2">
         ยกเลิก
       </button>
     </div>
@@ -217,17 +166,17 @@ const isProvinceValid = computed(() => {
 })
 
 const firstPageValid = computed(() => {
-  if(isPhoneValid.value && isNameValid.value && isSurnameValid.value && isDateofBirthSelected.value && isGenderSelected.value == true) {
+  if (isPhoneValid.value && isNameValid.value && isSurnameValid.value && isDateofBirthSelected.value && isGenderSelected.value == true) {
     return true;
-  }else{
+  } else {
     return false;
   }
 });
 
 const secondPageValid = computed(() => {
-  if(isProvinceValid.value && isStateValid.value && isAddressValid.value && isEmailValid.value == true) {
+  if (isProvinceValid.value && isStateValid.value && isAddressValid.value && isEmailValid.value == true) {
     return true;
-  }else{
+  } else {
     return false;
   }
 });
@@ -255,9 +204,8 @@ const submitRegistration = async () => {
       resultMsg.value = "Registration successful";
       console.log("Registration successful:", responseDate);
     } else {
-      resultMsg.value = `Registration failed: ${
-        responseDate.error || response.error
-      }`;
+      resultMsg.value = `Registration failed: ${responseDate.error || response.error
+        }`;
       console.error(
         "Registration failed:",
         responseData.error || response.statusText
@@ -296,6 +244,12 @@ template {
   border-bottom-right-radius: 10px;
 }
 
+/* breadcrumb disabled link */
+.disabled-link {
+  pointer-events: none;
+  cursor: default;
+}
+
 .result-box {
   position: fixed;
   top: 50%;
@@ -315,11 +269,13 @@ template {
 
 /* Success and Error Styling */
 .result-box.success {
-  border-left: 5px solid #4caf50; /* Green for success */
+  border-left: 5px solid #4caf50;
+  /* Green for success */
 }
 
 .result-box.error {
-  border-left: 5px solid #f44336; /* Red for error */
+  border-left: 5px solid #f44336;
+  /* Red for error */
 }
 
 .close-btn {
@@ -346,10 +302,12 @@ template {
 .spinner {
   border: 4px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top: 4px solid #3498db; /* Blue color to match theme */
+  border-top: 4px solid #3498db;
+  /* Blue color to match theme */
   width: 20px;
   height: 20px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
+  -webkit-animation: spin 2s linear infinite;
+  /* Safari */
   animation: spin 2s linear infinite;
 }
 
@@ -358,6 +316,7 @@ template {
   0% {
     -webkit-transform: rotate(0deg);
   }
+
   100% {
     -webkit-transform: rotate(360deg);
   }
@@ -367,6 +326,7 @@ template {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }

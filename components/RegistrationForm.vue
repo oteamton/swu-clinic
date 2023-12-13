@@ -1,4 +1,3 @@
-6
 <template>
   <h2 class="text-4xl text-center mb-4 text-white">ลงทะเบียน</h2>
   <div class="breadcrumb flex gap-1">
@@ -36,7 +35,7 @@
       <label for="gender">เพศ</label>
       <div
         id="gender"
-        class="flex gap-2 border-orange-300 border-2 p-2"
+        class="flex gap-2 border-orange-300 border-2 p-2 rounded"
         :class="{ 'border-none': isGenderSelected }"
       >
         <label>
@@ -282,7 +281,7 @@ const submitRegistration = async () => {
   loading.value = true;
   resultMsg.value = "";
   try {
-    console.log("Sending date:", formData.value);
+    // console.log("Sending date:", formData.value);
     const response = await fetch("http://localhost:8080/api/register", {
       method: "POST",
       headers: {
@@ -296,19 +295,19 @@ const submitRegistration = async () => {
     if (response.ok) {
       const data = await response.json();
       resultMsg.value = "Registration successful";
-      console.log("Registration successful:", responseDate);
+      // console.log("Registration successful:", responseDate);
     } else {
       resultMsg.value = `Registration failed: ${
         responseDate.error || response.error
       }`;
-      console.error(
-        "Registration failed:",
-        responseData.error || response.statusText
-      );
+      // console.error(
+      //   "Registration failed:",
+      //   responseData.error || response.statusText
+      // );
     }
   } catch (error) {
     // Handle any errors
-    console.error("Registration failed:", error.message);
+    // console.error("Registration failed:", error.message);
   } finally {
     loading.value = false;
     showModal.value = false;

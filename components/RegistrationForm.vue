@@ -27,7 +27,9 @@
   </div>
 
   <div class="relative flex justify-end w-80 mt-4">
-    <button class="text-gray-300 p-0 active:scale-90" @click="goToLogin">ผู้รักษาเก่า ?</button>
+    <button class="text-gray-300 p-0 active:scale-90" @click="goToLogin">
+      ผู้รักษาเก่า ?
+    </button>
   </div>
 
   <!-- main form -->
@@ -174,9 +176,14 @@
     </div>
 
     <div v-if="resultMsg" class="overlay">
-      <div v-if="resultMsg" class="result-box">
+      <div
+        v-if="resultMsg"
+        :class="['result-box', resultClass]"
+      >
         {{ resultMsg }}
-        <button @click="resultMsg = ''" class="close-btn">✕</button>
+        <button @click="resultMsg = ''" class="close-btn p-2 bg-slate-300 active:scale-90">
+          ✕
+        </button>
       </div>
     </div>
   </form>
@@ -197,9 +204,8 @@ const addressRegex = /^[A-Za-z\u0E00-\u0E7F0-9\s]+$/;
 const router = useRouter();
 
 const goToLogin = () => {
-  router.push('/login');
-}
-;
+  router.push("/login");
+};
 const NextPage = () => {
   if (firstPageValid.value) {
     currStep.value++;
@@ -289,9 +295,13 @@ const secondPageValid = computed(() => {
 // console.log(isGenderSelected.value, isDateofBirthSelected.value, isPhoneValid.value, isNameValid.value, isSurnameValid.value)
 // console.log(firstPageValid.value)
 
+const resultClass = computed (() => {
+  return resultMsg.value.includes('successful') ? 'success': 'error';
+})
+
 const submitRegistration = async () => {
   loading.value = true;
-  resultMsg.value = "";
+  // resultMsg.value = "";
   try {
     // console.log("Sending date:", formData.value);
     const response = await fetch("http://localhost:8080/api/register", {
@@ -305,7 +315,6 @@ const submitRegistration = async () => {
     const responseDate = await response.json();
 
     if (response.ok) {
-      const data = await response.json();
       resultMsg.value = "Registration successful";
       // console.log("Registration successful:", responseDate);
     } else {
@@ -318,7 +327,8 @@ const submitRegistration = async () => {
       // );
     }
   } catch (error) {
-    // Handle any errors
+    // Handle any other errors
+    resultMsg.value = error.message;
     // console.error("Registration failed:", error.message);
   } finally {
     loading.value = false;
@@ -377,14 +387,14 @@ template {
   text-align: center;
 }
 
+/* Style for result pop up */
 .result-box {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
   max-width: 400px;
-  padding: 15px;
+  padding: 15px 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
@@ -396,21 +406,17 @@ template {
 
 /* Success and Error Styling */
 .result-box.success {
-  border-left: 5px solid #4caf50;
+  border: 5px solid #4caf50;
   /* Green for success */
 }
 
 .result-box.error {
-  border-left: 5px solid #f44336;
-  /* Red for error */
+  border: 5px solid #f44336;
 }
 
 .close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10;
-  border: none;
-  background: none;
+  min-width: 50px;
+  border-radius: 50%;
   cursor: pointer;
   font-size: 1.5rem;
 }

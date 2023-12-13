@@ -26,6 +26,11 @@
     >
   </div>
 
+  <div class="relative flex justify-end w-80 mt-4">
+    <button class="text-gray-300 p-0 active:scale-90" @click="goToLogin">ผู้รักษาเก่า ?</button>
+  </div>
+
+  <!-- main form -->
   <form
     @submit.prevent="submitRegistration"
     class="flex flex-col justify-center w-96 gap-1 p-4 input"
@@ -179,6 +184,8 @@
 
 <script setup>
 import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+
 const currStep = ref(1);
 const loading = ref(false);
 const showModal = ref(false);
@@ -187,7 +194,12 @@ const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 const nameRegex = /^[A-Za-z\u0E00-\u0E7F]+$/;
 const phoneRegex = /^[0-9]+$/;
 const addressRegex = /^[A-Za-z\u0E00-\u0E7F0-9\s]+$/;
+const router = useRouter();
 
+const goToLogin = () => {
+  router.push('/login');
+}
+;
 const NextPage = () => {
   if (firstPageValid.value) {
     currStep.value++;

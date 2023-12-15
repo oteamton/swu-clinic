@@ -26,7 +26,23 @@
     >
   </div>
 
-  <div class="relative flex justify-end w-80 mt-4">
+  <!-- Policy and login -->
+  <div class="relative flex w-80 mt-4">
+    <div class="border-2 border-white">
+      <input
+        type="radio"
+        v-model="formData.accept"
+        value="ยอมรับ"
+        class="m-2"
+      />
+      <button @click="showPopup = true" class="text-slate-300 active:scale-90">
+        Privacy Policy
+      </button>
+      <Popup :visible="showPopup">
+        <PrivacyPolicy />
+      </Popup>
+    </div>
+
     <button class="text-gray-300 p-0 active:scale-90" @click="goToLogin">
       ผู้รักษาเก่า ?
     </button>
@@ -176,12 +192,12 @@
     </div>
 
     <div v-if="resultMsg" class="overlay">
-      <div
-        v-if="resultMsg"
-        :class="['result-box', resultClass]"
-      >
+      <div v-if="resultMsg" :class="['result-box', resultClass]">
         {{ resultMsg }}
-        <button @click="resultMsg = ''" class="close-btn p-2 bg-slate-300 active:scale-90">
+        <button
+          @click="resultMsg = ''"
+          class="close-btn p-2 bg-slate-300 active:scale-90"
+        >
           ✕
         </button>
       </div>
@@ -189,13 +205,16 @@
   </form>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import Popup from "./Popup.vue";
+import PrivacyPolicy from "./PrivacyPolicy.vue";
 
 const currStep = ref(1);
 const loading = ref(false);
 const showModal = ref(false);
+const showPopup = ref(false);
 const resultMsg = ref("");
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 const nameRegex = /^[A-Za-z\u0E00-\u0E7F]+$/;
@@ -213,6 +232,7 @@ const NextPage = () => {
 };
 
 const formData = ref({
+  accept: "",
   name: "",
   surname: "",
   date_of_birth: "",
@@ -295,9 +315,9 @@ const secondPageValid = computed(() => {
 // console.log(isGenderSelected.value, isDateofBirthSelected.value, isPhoneValid.value, isNameValid.value, isSurnameValid.value)
 // console.log(firstPageValid.value)
 
-const resultClass = computed (() => {
-  return resultMsg.value.includes('successful') ? 'success': 'error';
-})
+const resultClass = computed(() => {
+  return resultMsg.value.includes("successful") ? "success" : "error";
+});
 
 const submitRegistration = async () => {
   loading.value = true;
@@ -312,21 +332,25 @@ const submitRegistration = async () => {
       body: JSON.stringify(formData.value),
     });
 
-    const responseDate = await response.json();
+    interface ResponseData {
+      error?: string;
+    }
+
+    const responseData: ResponseData = await response.json();
 
     if (response.ok) {
       resultMsg.value = "Registration successful";
-      // console.log("Registration successful:", responseDate);
+      // console.log("Registration successful:", responseData);
     } else {
       resultMsg.value = `Registration failed: ${
-        responseDate.error || response.error
+        responseData.error || response.statusText
       }`;
       // console.error(
       //   "Registration failed:",
       //   responseData.error || response.statusText
       // );
     }
-  } catch (error) {
+  } catch (error: any) {
     // Handle any other errors
     resultMsg.value = error.message;
     // console.error("Registration failed:", error.message);

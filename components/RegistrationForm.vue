@@ -27,18 +27,18 @@
   </div>
 
   <!-- Policy and login -->
-  <div class="relative flex w-80 mt-4">
-    <div class="border-2 border-white">
+  <div class="pol-log-container relative w-80 mt-4">
+    <div class="policy-wrapper border-2 border-white m-2">
       <input
-        type="radio"
-        v-model="formData.accept"
-        value="ยอมรับ"
-        class="m-2"
+        type="checkbox"
+        :checked="isSelected"
+        @click="policyAccept"
+        class="m-2 ml-1"
       />
       <button @click="showPopup = true" class="text-slate-300 active:scale-90">
         Privacy Policy
       </button>
-      <Popup :visible="showPopup">
+      <Popup :visible="showPopup" @update:visible="showPopup = $event">
         <PrivacyPolicy />
       </Popup>
     </div>
@@ -168,7 +168,7 @@
       </button>
     </div>
 
-    <!-- modal pop up -->
+    <!-- modal pop up before submitting -->
     <div v-if="showModal" class="modal">
       <span v-if="loading" class="spinner self-center"></span>
       <div v-else class="modal-content">
@@ -192,11 +192,11 @@
     </div>
 
     <div v-if="resultMsg" class="overlay">
-      <div v-if="resultMsg" :class="['result-box', resultClass]">
+      <div v-if="resultMsg" :class="['result-box', resultClass]" class="flex items-center gap-2" >
         {{ resultMsg }}
         <button
           @click="resultMsg = ''"
-          class="close-btn p-2 bg-slate-300 active:scale-90"
+          class="close-btn-parent bg-slate-300 active:scale-90"
         >
           ✕
         </button>
@@ -213,8 +213,9 @@ import PrivacyPolicy from "./PrivacyPolicy.vue";
 
 const currStep = ref(1);
 const loading = ref(false);
-const showModal = ref(false);
-const showPopup = ref(false);
+const showModal = ref(false); // for ensure subbmitting
+const showPopup = ref(false); // for privacy policy
+const confPolicy = ref(false); // checkbox in privacy policy
 const resultMsg = ref("");
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 const nameRegex = /^[A-Za-z\u0E00-\u0E7F]+$/;
@@ -222,17 +223,8 @@ const phoneRegex = /^[0-9]+$/;
 const addressRegex = /^[A-Za-z\u0E00-\u0E7F0-9\s]+$/;
 const router = useRouter();
 
-const goToLogin = () => {
-  router.push("/login");
-};
-const NextPage = () => {
-  if (firstPageValid.value) {
-    currStep.value++;
-  }
-};
-
 const formData = ref({
-  accept: "",
+  accept: "ไม่ยอมรับ",
   name: "",
   surname: "",
   date_of_birth: "",
@@ -243,6 +235,22 @@ const formData = ref({
   state: "",
   gender: "",
 });
+
+const policyAccept = () => {
+  confPolicy.value = !confPolicy.value;
+
+  formData.value.accept = confPolicy.value ? "ยอมรับ" : "ไม่ยอมรับ";
+};
+
+const goToLogin = () => {
+  router.push("/login");
+};
+
+const NextPage = () => {
+  if (firstPageValid.value) {
+    currStep.value++;
+  }
+};
 
 // Valid function
 const isNameValid = computed(() => {
@@ -304,6 +312,7 @@ const secondPageValid = computed(() => {
     isProvinceValid.value &&
     isStateValid.value &&
     isAddressValid.value &&
+    isSelected.value &&
     isEmailValid.value == true
   ) {
     return true;
@@ -312,6 +321,7 @@ const secondPageValid = computed(() => {
   }
 });
 
+const isSelected = computed(() => confPolicy.value);
 // console.log(isGenderSelected.value, isDateofBirthSelected.value, isPhoneValid.value, isNameValid.value, isSurnameValid.value)
 // console.log(firstPageValid.value)
 
@@ -340,6 +350,7 @@ const submitRegistration = async () => {
 
     if (response.ok) {
       resultMsg.value = "Registration successful";
+      navigateTo("/medical-history");
       // console.log("Registration successful:", responseData);
     } else {
       resultMsg.value = `Registration failed: ${
@@ -391,6 +402,21 @@ template {
   cursor: default;
 }
 
+.pol-log-container {
+  display: grid;
+  grid-template-columns: [l-e] 0.6fr [l-s] 1.2fr [r-s] 0.6fr [r-e];
+}
+
+.pol-log-container .policy-wrapper {
+  grid-column: l-s / r-s;
+  display: flex;
+  place-content: center;
+}
+
+.pol-log-container .policy-wrapper button {
+  justify-self: end;
+}
+
 /* modal pop-up */
 .modal {
   position: fixed;
@@ -438,11 +464,17 @@ template {
   border: 5px solid #f44336;
 }
 
-.close-btn {
-  min-width: 50px;
+.close-btn-parent{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  transition: transform 0.2 ease-in-out;
 }
 
 .overlay {

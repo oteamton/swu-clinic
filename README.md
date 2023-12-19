@@ -1,4 +1,16 @@
-# Nuxt 3 Minimal Starter
+# SWU Clinic Nuxt 3
+
+The project is mainly for mobile target and easier UX.
+
+## Features
+
+- Appointment booking per therapist.
+- Collect data so you will never need to re-enter again.
+
+To complete
+ routing and authentication
+
+## Nuxt 3 Minimal Starter
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 

@@ -6,8 +6,8 @@
       class="p-4 text-white"
       @click="currStep = 1"
       :class="{
-        'bg-gray-500': !firstPageValid,
-        'bg-green-700': firstPageValid,
+        'bg-gray-500': !firstStepValid,
+        'bg-green-700': firstStepValid,
         'border-white border-2': currStep === 1,
       }"
       >ส่วนที่ 1</a
@@ -16,12 +16,12 @@
       href="#"
       class="p-4 text-white"
       :class="{
-        'disabled-link': !firstPageValid,
-        'bg-gray-500': !secondPageValid,
-        'bg-green-700': secondPageValid,
+        'disabled-link': !firstStepValid,
+        'bg-gray-500': !secondStepValid,
+        'bg-green-700': secondStepValid,
         'border-white border-2': currStep === 2,
       }"
-      @click="firstPageValid ? (currStep = 2) : $event.preventDefault()"
+      @click="firstStepValid ? (currStep = 2) : $event.preventDefault()"
       >ส่วนที่ 2</a
     >
   </div>
@@ -98,17 +98,12 @@
       <span class="text-orange-300" v-if="!isDateofBirthSelected"
         >Please select a date</span
       >
-      <label for="phone">เบอร์โทรศัพท์</label>
-      <input v-model="formData.phone" type="text" id="phone" required />
-      <span class="text-orange-300" v-if="!isPhoneValid"
-        >Please enter valid phone</span
-      >
 
       <button
-        :disabled="!firstPageValid"
+        :disabled="!firstStepValid"
         :class="{
-          'bg-gray-500': !firstPageValid,
-          'bg-blue-500 hover:bg-blue-700 active:bg-blue-800': firstPageValid,
+          'bg-gray-500': !firstStepValid,
+          'bg-blue-500 hover:bg-blue-700 active:bg-blue-800': firstStepValid,
         }"
         type="button"
         @click="NextPage"
@@ -120,39 +115,35 @@
 
     <!-- page 2 -->
     <div v-if="currStep === 2" class="flex flex-col gap-2 mb-4">
+      <label for="line">Line ID</label>
+      <input v-model="formData.LindId" type="text" id="lineId" required />
+
       <label for="email">อีเมล์</label>
       <input v-model="formData.email" type="email" id="email" required />
       <span class="text-orange-300" v-if="!isEmailValid"
         >Please enter valid email</span
       >
-
-      <label for="address">ที่อยู่</label>
-      <input v-model="formData.address" type="text" id="address" required />
-      <span class="text-orange-300" v-if="!isEmailValid"
-        >Please enter address</span
+      <label for="phone">เบอร์โทรศัพท์</label>
+      <input v-model="formData.phone" type="text" id="phone" required />
+      <span class="text-orange-300" v-if="!isPhoneValid"
+        >Please enter valid phone</span
       >
 
-      <label for="province">จังหวัด</label>
-      <input v-model="formData.province" type="text" id="province" required />
-      <span class="text-orange-300" v-if="!isEmailValid"
-        >Please enter province</span
-      >
-
-      <label for="state">แขวง</label>
-      <input v-model="formData.state" type="text" id="state" required />
-      <span class="text-orange-300" v-if="!isEmailValid"
-        >Please enter state</span
-      >
+      <label>เบอร์โทรศัพท์บุคคลใกล้ตัว</label>
+      <input v-model="formData.phoneOptional" type="text" id="phone" />
+      <!-- <span class="text-orange-300" v-if="!isPhoneValid"
+        >Please enter valid phone</span
+      > -->
     </div>
 
     <div v-if="currStep === 2" class="flex justify-center gap-2">
       <button
         type="button"
-        :disabled="!secondPageValid"
+        :disabled="!secondStepValid"
         :class="{
-          'bg-gray-500': !secondPageValid,
+          'bg-gray-500': !secondStepValid,
           'bg-blue-500 hover:bg-blue-700 active:bg-blue-800 active:scale-90':
-            secondPageValid,
+            secondStepValid,
         }"
         class="text-white font-bold py-2 px-4 rounded mt-2"
         @click="showModal = true"
@@ -192,7 +183,11 @@
     </div>
 
     <div v-if="resultMsg" class="overlay">
-      <div v-if="resultMsg" :class="['result-box', resultClass]" class="flex items-center gap-2" >
+      <div
+        v-if="resultMsg"
+        :class="['result-box', resultClass]"
+        class="flex items-center gap-2"
+      >
         {{ resultMsg }}
         <button
           @click="resultMsg = ''"
@@ -223,16 +218,20 @@ const phoneRegex = /^[0-9]+$/;
 const addressRegex = /^[A-Za-z\u0E00-\u0E7F0-9\s]+$/;
 const router = useRouter();
 
+interface ResponseData {
+      error?: string;
+      token?: string;
+    }
+
 const formData = ref({
   accept: "ไม่ยอมรับ",
   name: "",
   surname: "",
   date_of_birth: "",
   phone: "",
+  phoneOptional: "",
+  LindId: "",
   email: "",
-  address: "",
-  province: "",
-  state: "",
   gender: "",
 });
 
@@ -247,7 +246,7 @@ const goToLogin = () => {
 };
 
 const NextPage = () => {
-  if (firstPageValid.value) {
+  if (firstStepValid.value) {
     currStep.value++;
   }
 };
@@ -281,21 +280,8 @@ const isPhoneValid = computed(() => {
   );
 });
 
-const isAddressValid = computed(() => {
-  return addressRegex.test(formData.value.address);
-});
-
-const isStateValid = computed(() => {
-  return addressRegex.test(formData.value.state);
-});
-
-const isProvinceValid = computed(() => {
-  return addressRegex.test(formData.value.province);
-});
-
-const firstPageValid = computed(() => {
+const firstStepValid = computed(() => {
   if (
-    isPhoneValid.value &&
     isNameValid.value &&
     isSurnameValid.value &&
     isDateofBirthSelected.value &&
@@ -307,14 +293,8 @@ const firstPageValid = computed(() => {
   }
 });
 
-const secondPageValid = computed(() => {
-  if (
-    isProvinceValid.value &&
-    isStateValid.value &&
-    isAddressValid.value &&
-    isSelected.value &&
-    isEmailValid.value == true
-  ) {
+const secondStepValid = computed(() => {
+  if (isPhoneValid.value && isSelected.value && isEmailValid.value == true) {
     return true;
   } else {
     return false;
@@ -323,7 +303,7 @@ const secondPageValid = computed(() => {
 
 const isSelected = computed(() => confPolicy.value);
 // console.log(isGenderSelected.value, isDateofBirthSelected.value, isPhoneValid.value, isNameValid.value, isSurnameValid.value)
-// console.log(firstPageValid.value)
+// console.log(firstStepValid.value)
 
 const resultClass = computed(() => {
   return resultMsg.value.includes("successful") ? "success" : "error";
@@ -331,7 +311,7 @@ const resultClass = computed(() => {
 
 const submitRegistration = async () => {
   loading.value = true;
-  // resultMsg.value = "";
+  resultMsg.value = ""; // Clearing any previous messages
   try {
     // console.log("Sending date:", formData.value);
     const response = await fetch("http://localhost:8080/api/register", {
@@ -342,15 +322,16 @@ const submitRegistration = async () => {
       body: JSON.stringify(formData.value),
     });
 
-    interface ResponseData {
-      error?: string;
-    }
-
     const responseData: ResponseData = await response.json();
 
     if (response.ok) {
-      resultMsg.value = "Registration successful";
-      navigateTo("/medical-history");
+      if (responseData.token) {
+        resultMsg.value = "Registration successful";
+        navigateTo(`/medical-history/${responseData.token}`);
+      } else {
+        resultMsg.value = "Registration failed no token found";
+      }
+
       // console.log("Registration successful:", responseData);
     } else {
       resultMsg.value = `Registration failed: ${
@@ -464,7 +445,7 @@ template {
   border: 5px solid #f44336;
 }
 
-.close-btn-parent{
+.close-btn-parent {
   display: flex;
   justify-content: center;
   align-items: center;

@@ -314,7 +314,7 @@ const submitRegistration = async () => {
   resultMsg.value = ""; // Clearing any previous messages
   try {
     // console.log("Sending date:", formData.value);
-    const response = await fetch("http://localhost:8080/api/register", {
+    const response = await fetch("http://localhost:8080/api/v1/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

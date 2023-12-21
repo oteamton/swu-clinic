@@ -32,14 +32,15 @@
         'disabled-link': !firstStepValid,
         'bg-gray-500': !secondStepValid,
         'bg-green-700': secondStepValid,
-        'border-white border-2': currStep === 2,
+        'border-white border-2': currStep === 3,
       }"
-      @click="firstStepValid ? (currStep = 2) : $event.preventDefault()"
+      @click="firstStepValid ? (currStep = 3) : $event.preventDefault()"
       >ส่วนที่ 3</a
     >
   </div>
-  <div class="first-container">
-    <h2 class="text-xl text-white mt-4 text-center">
+
+  <div v-if="currStep === 1" class="first-container">
+    <h2 class="text-xl text-white mt-4 mb-1 text-center">
       ประวัติสุขภาพ (Medical History)
     </h2>
     <div
@@ -116,6 +117,7 @@
         type="text"
         id="medicalSpecific"
         placeholder="ประวัติการได้รับการรักษาทางการแพทย์ เช่นการผ่าตัด หรือได้รับการรักษาโรคร้ายแรงอื่นๆ (Surgical procedure, Drug Allergy, Currently used medicine, etc.)"
+        class="placeholder-adj"
       />
       <label for="name" class="text-white"
         >ข้อมูลสุขภาพอื่นๆ โปรดระบุ (Others please specify)</label
@@ -126,11 +128,23 @@
         placeholder="ประวัติแพ้ยา ยาที่ใช้ในปัจจุบัน ฯลฯ (Surgical procedure, Drug Allergy, Currently used medicine, etc.)"
         class="placeholder-adj"
       />
+      <label class="text-white flex gap-4 mt-4 justify-center"
+        ><input
+          type="checkbox"
+          class="h-6 w-6 self-center"
+        />ท่านต้องการใบรับรองทางกายภาพบำบัด หรือไม่
+        <br />
+        Do you need Physical Therapy Certificate?
+      </label>
     </div>
 
+    <hr class="custom-hr mt-6" />
+    <h2 class="text-xl mb-1 mt-4 text-white text-center">
+      สิทธิการรักษา (Medical Rights)
+    </h2>
     <div
       id="medicalRights"
-      class="flex flex-col gap-2 border-2 p-2 rounded text-white"
+      class="rightsBox flex flex-col gap-2 border-2 p-2 rounded m-auto text-white"
     >
       <label>
         <input
@@ -189,12 +203,18 @@
         บุคคลทั่วไป (General public)
       </label>
     </div>
+
+    <div class="flex justify-center my-4">
+      <button class="bg-blue-500 p-2 rounded active:scale-90">Next Step</button>
+    </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref, computed } from "vue";
 
 const currStep = ref(1);
+const collapsed = ref(true);
 // const urlParams = new URLSearchParams(window.location.search);
 // const token = urlParams.get("token");
 
@@ -212,6 +232,10 @@ const secondStepValid = computed(() => {
   // Missing valid logic
   return true;
 });
+
+function toggleCollapsed() {
+  collapsed.value = !collapsed.value;
+}
 
 // if (!token) {
 //   // Handle missing token
@@ -231,18 +255,7 @@ const validateToken = async () => {
 </script>
 
 <style>
-.first-container {
-  display: grid;
-  grid-template-columns: [l-e] auto [l-s] 1fr [r-s] auto [r-e];
-  gap: 10px;
-}
-
-.first-container label {
-  grid-column: l-e / l-s;
-}
-
 .medicalBox {
-  grid-column: l-e / l-s;
   flex-wrap: wrap;
   max-width: 500px;
   height: auto;
@@ -253,6 +266,23 @@ const validateToken = async () => {
   padding-inline: 4px;
   border: 2px solid rgb(107 114 128);
   border-radius: 0.25rem;
+}
+
+.custom-hr {
+  height: 2px;
+  background-color: hsla(0 0% 95% 0.8);
+  filter: drop-shadow(0 0 2px white);
+  /* background-image: linear-gradient(to right, rgba(21 128 61 0), rgba( 0 0 0.2), rgba(0 0 0 0));
+  background-position: center;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 1px; */
+  /* margin: 2rem 0; Center horizoltally */
+}
+
+.rightsBox {
+  flex-wrap: wrap;
+  height: auto;
 }
 
 input,
@@ -268,5 +298,12 @@ input.placeholder-adj::placeholder {
   font-size: smaller;
   font-weight: normal;
   letter-spacing: 0.05em;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 768px) {
+  .custom-hr {
+    margin: 1rem 0;
+  }
 }
 </style>

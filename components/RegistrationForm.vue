@@ -106,7 +106,7 @@
           'bg-blue-500 hover:bg-blue-700 active:bg-blue-800': firstStepValid,
         }"
         type="button"
-        @click="NextPage"
+        @click="nextStep"
         class="text-white font-bold py-2 px-4 rounded mt-4 max-w-fit self-center"
       >
         หน้าถัดไป
@@ -245,7 +245,7 @@ const goToLogin = () => {
   router.push("/login");
 };
 
-const NextPage = () => {
+const nextStep = () => {
   if (firstStepValid.value) {
     currStep.value++;
   }
@@ -337,10 +337,10 @@ const submitRegistration = async () => {
       resultMsg.value = `Registration failed: ${
         responseData.error || response.statusText
       }`;
-      // console.error(
-      //   "Registration failed:",
-      //   responseData.error || response.statusText
-      // );
+      console.error(
+        "Registration failed:",
+        responseData.error || response.statusText
+      );
     }
   } catch (error: any) {
     // Handle any other errors
@@ -353,7 +353,7 @@ const submitRegistration = async () => {
 };
 </script>
 
-<style>
+<style scoped>
 template {
   font-family: "Kanit", sans-serif;
 }

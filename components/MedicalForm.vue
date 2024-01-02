@@ -4,15 +4,18 @@
   <div class="breadcrumb flex gap-1">
     <a
       href="#"
-      class="p-4 text-white"
+      class="p-4 text-white text-center"
       @click="currStep = 1"
       :class="{
         'bg-gray-500': !firstStepValid,
         'bg-green-700': firstStepValid,
         'border-white border-2': currStep === 1,
       }"
-      >ส่วนที่ 1</a
-    >
+      >ส่วนที่ 1
+      <p :class="{ hidden: !(currStep === 1) }">
+        ประวัติสุขภาพ (Medical History)
+      </p>
+    </a>
     <a
       href="#"
       class="p-4 text-white"
@@ -30,8 +33,8 @@
       class="p-4 text-white"
       :class="{
         'disabled-link': !firstStepValid,
-        'bg-gray-500': !secondStepValid,
-        'bg-green-700': secondStepValid,
+        'bg-gray-500': !thirdStepValid,
+        'bg-green-700': thirdStepValid,
         'border-white border-2': currStep === 3,
       }"
       @click="firstStepValid ? (currStep = 3) : $event.preventDefault()"
@@ -39,8 +42,9 @@
     >
   </div>
 
-  <div v-if="currStep === 1" class="first-container">
-    <h2 class="text-xl text-white mt-4 mb-1 text-center">
+  <div v-if="currStep === 1" class="first-container mb-4">
+    <hr class="custom-hr mt-6" />
+    <h2 class="text-xl text-white mt-4 mb-2 text-center">
       ประวัติสุขภาพ (Medical History)
     </h2>
     <div
@@ -108,7 +112,6 @@
         อื่นๆ (Others)
       </label>
     </div>
-
     <div class="flex flex-col gap-2 mt-4">
       <label for="name" class="text-white"
         >ข้อมูลสุขภาพอื่นๆ โปรดระบุ (Others please specify)</label
@@ -128,16 +131,25 @@
         placeholder="ประวัติแพ้ยา ยาที่ใช้ในปัจจุบัน ฯลฯ (Surgical procedure, Drug Allergy, Currently used medicine, etc.)"
         class="placeholder-adj"
       />
-      <label class="text-white flex gap-4 mt-4 justify-center"
-        ><input
-          type="checkbox"
-          class="h-6 w-6 self-center"
-        />ท่านต้องการใบรับรองทางกายภาพบำบัด หรือไม่
-        <br />
-        Do you need Physical Therapy Certificate?
-      </label>
     </div>
 
+    <div class="text-center">
+      <button
+        :disabled="!firstStepValid"
+        :class="{
+          'bg-gray-500': !firstStepValid,
+          'bg-blue-500 hover:bg-blue-700 active:bg-blue-800': firstStepValid,
+        }"
+        type="button"
+        @click="nextStep"
+        class="text-white font-bold py-2 px-4 rounded mt-4 max-w-fit"
+      >
+        หน้าถัดไป
+      </button>
+    </div>
+  </div>
+  <!-- Second step  -->
+  <div v-if="currStep === 2" class="second-container">
     <hr class="custom-hr mt-6" />
     <h2 class="text-xl mb-1 mt-4 text-white text-center">
       สิทธิการรักษา (Medical Rights)
@@ -204,8 +216,87 @@
       </label>
     </div>
 
-    <div class="flex justify-center my-4">
-      <button class="bg-blue-500 p-2 rounded active:scale-90">Next Step</button>
+    <div>
+      <label class="text-white flex gap-4 mt-4 justify-center"
+        ><input
+          type="checkbox"
+          class="h-6 w-6 self-center"
+        />ท่านต้องการใบรับรองทางกายภาพบำบัด หรือไม่
+        <br />
+        Do you need Physical Therapy Certificate?
+      </label>
+    </div>
+    <div class="text-center">
+      <button
+        :disabled="!firstStepValid"
+        :class="{
+          'bg-gray-500': !firstStepValid,
+          'bg-blue-500 hover:bg-blue-700 active:bg-blue-800': firstStepValid,
+        }"
+        type="button"
+        @click="nextStep"
+        class="text-white font-bold py-2 px-4 rounded mt-4 max-w-fit self-center"
+      >
+        หน้าถัดไป
+      </button>
+    </div>
+  </div>
+
+  <!-- Third step  -->
+  <div v-if="currStep === 3" class="third-container">
+    <hr class="custom-hr mt-6" />
+    <h2 class="text-xl mb-1 mt-4 text-white text-center">
+      อาการสำคัญ อาการเจ็บป่วย (Chief Complaint)
+    </h2>
+    <div class="flex flex-col justify-center text-white">
+      <label class="text-white mb-2">
+        อธิบายอาการที่มีความสำคัญมากที่สุด (Main Symptom)</label
+      >
+      <textarea class="text-black rounded"></textarea>
+      <div class="flex flex-col justify-center gap-1 text-white mt-4">
+        <label>
+          มีอาการดังกล่าวมาแล้วนานเท่าใด (How long does the symptoms occur?)
+        </label>
+        <label>
+          <input type="radio" v-model="formData.symptomsOccur" value="1-3" />
+          ประมาณ 1-3 วัน (1-3 day)
+        </label>
+        <label>
+          <input type="radio" v-model="formData.symptomsOccur" value=">7" />
+          มากกว่า 1 สัปดาห์ (>1 week)
+        </label>
+        <label>
+          <input type="radio" v-model="formData.symptomsOccur" value=">30" />
+          มากกว่า 1 เดือน(>1 month)
+        </label>
+        <label>
+          <input type="radio" v-model="formData.symptomsOccur" value=">90" />
+          มากกว่า 3 เดือน (> 3 months)
+        </label>
+        <label>
+          <input type="radio" v-model="formData.medicalRights" value=">180" />
+          มากกว่า 6 เดือน (> 6 months)
+        </label>
+        <label>
+          <input type="radio" v-model="formData.medicalRights" value=">365" />
+          มากกว่า 1 ปี (>1 year)
+        </label>
+      </div>
+      <DraggableRating/>
+    </div>
+    <div class="text-center">
+      <button
+        :disabled="!firstStepValid"
+        :class="{
+          'bg-gray-500': !firstStepValid,
+          'bg-blue-500 hover:bg-blue-700 active:bg-blue-800': firstStepValid,
+        }"
+        type="button"
+        @click="nextStep"
+        class="text-white font-bold py-2 px-4 rounded mt-4 max-w-fit self-center"
+      >
+        หน้าถัดไป
+      </button>
     </div>
   </div>
 </template>
@@ -221,6 +312,7 @@ const collapsed = ref(true);
 const formData = ref({
   medicalHistory: "",
   medicalRights: "",
+  symptomsOccur: "",
 });
 
 const firstStepValid = computed(() => {
@@ -232,6 +324,17 @@ const secondStepValid = computed(() => {
   // Missing valid logic
   return true;
 });
+
+const thirdStepValid = computed(() => {
+  // Implement lodic
+  return true;
+});
+
+const nextStep = () => {
+  if (firstStepValid.value) {
+    currStep.value++;
+  }
+};
 
 function toggleCollapsed() {
   collapsed.value = !collapsed.value;
@@ -255,6 +358,16 @@ const validateToken = async () => {
 </script>
 
 <style>
+.breadcrumb a:nth-child(1) {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.breadcrumb a:nth-child(3) {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
 .medicalBox {
   flex-wrap: wrap;
   max-width: 500px;

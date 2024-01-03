@@ -253,7 +253,7 @@
         อธิบายอาการที่มีความสำคัญมากที่สุด (Main Symptom)</label
       >
       <textarea class="text-black rounded"></textarea>
-      <div class="flex flex-col justify-center gap-1 text-white mt-4">
+      <div class="flex flex-col justify-center gap-1 text-white my-4">
         <label>
           มีอาการดังกล่าวมาแล้วนานเท่าใด (How long does the symptoms occur?)
         </label>
@@ -282,7 +282,7 @@
           มากกว่า 1 ปี (>1 year)
         </label>
       </div>
-      <DraggableRating/>
+      <PainRating/>
     </div>
     <div class="text-center">
       <button
@@ -303,6 +303,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import PainRating from "./PainRating.vue";
 
 const currStep = ref(1);
 const collapsed = ref(true);

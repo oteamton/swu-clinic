@@ -54,7 +54,9 @@ const closePopup = () => {
 .close-btn {
   position: absolute;
   border: none;
-  height: 50px;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
   background-color: rgb(107 114 128);
   cursor: pointer;
   font-size: 1rem;

@@ -28,21 +28,6 @@
 
   <!-- Policy and login -->
   <div class="pol-log-container relative w-80 mt-4">
-    <div class="policy-wrapper border-2 border-white m-2">
-      <input
-        type="checkbox"
-        :checked="isSelected"
-        @click="policyAccept"
-        class="m-2 ml-1"
-      />
-      <button @click="showPopup = true" class="text-slate-300 active:scale-90">
-        Privacy Policy
-      </button>
-      <Popup :visible="showPopup" @update:visible="showPopup = $event">
-        <PrivacyPolicy />
-      </Popup>
-    </div>
-
     <button class="text-gray-300 p-0 active:scale-90" @click="goToLogin">
       ผู้รักษาเก่า ?
     </button>
@@ -114,7 +99,7 @@
     </div>
 
     <!-- page 2 -->
-    <div v-if="currStep === 2" class="flex flex-col gap-2 mb-4">
+    <div v-if="currStep === 2" class="flex flex-col gap-2">
       <label for="line">Line ID</label>
       <input v-model="formData.LindId" type="text" id="lineId" required />
 
@@ -135,6 +120,27 @@
         >Please enter valid phone</span
       > -->
     </div>
+    <div
+      v-if="currStep === 2"
+      class="policy-wrapper flex justify-center px-2 m-2 w-auto"
+    >
+      <input
+        type="checkbox"
+        :checked="isSelected"
+        @click="policyAccept"
+        class="m-2 ml-0"
+      />
+      <button
+        @click="showPopup = true"
+        class="text-slate-300 underline- active:scale-90"
+        :class="{ 'text-green-500 no-underline': isSelected }"
+      >
+        ชี้แจงรายละเอียดการประมวลผลข้อมูลส่วนบุคคล (Privacy Policy)
+      </button>
+      <Popup :visible="showPopup" @update:visible="showPopup = $event">
+        <PrivacyPolicy />
+      </Popup>
+    </div>
 
     <div v-if="currStep === 2" class="flex justify-center gap-2">
       <button
@@ -146,10 +152,21 @@
             secondStepValid,
         }"
         class="text-white font-bold py-2 px-4 rounded mt-2"
-        @click="showModal = true"
+        @click="confirmPolicy"
       >
         ยืนยัน
       </button>
+      <Popup
+        :visible="showPopupAlert"
+        @update:visible="showPopupAlert = $event"
+      >
+        <div>
+          <h1>
+            กรุณาอ่านตรวจสอบและยอมรับข้อกำหนดในการใช้งาน <br />(Please read,
+            review and accept the terms of use.)
+          </h1>
+        </div>
+      </Popup>
       <button
         type="button"
         @click="currStep = 1"
@@ -209,19 +226,20 @@ import PrivacyPolicy from "./PrivacyPolicy.vue";
 const currStep = ref(1);
 const loading = ref(false);
 const showModal = ref(false); // for ensure subbmitting
-const showPopup = ref(false); // for privacy policy
+const showPopup = ref(false); // for display privacy policy
+const showPopupAlert = ref(false); // Alert for checking pp box
 const confPolicy = ref(false); // checkbox in privacy policy
 const resultMsg = ref("");
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 const nameRegex = /^[A-Za-z\u0E00-\u0E7F]+$/;
 const phoneRegex = /^[0-9]+$/;
-const addressRegex = /^[A-Za-z\u0E00-\u0E7F0-9\s]+$/;
+// const addressRegex = /^[A-Za-z\u0E00-\u0E7F0-9\s]+$/;
 const router = useRouter();
 
 interface ResponseData {
-      error?: string;
-      token?: string;
-    }
+  error?: string;
+  token?: string;
+}
 
 const formData = ref({
   accept: "ไม่ยอมรับ",
@@ -294,7 +312,7 @@ const firstStepValid = computed(() => {
 });
 
 const secondStepValid = computed(() => {
-  if (isPhoneValid.value && isSelected.value && isEmailValid.value == true) {
+  if (isPhoneValid.value && isEmailValid.value == true) {
     return true;
   } else {
     return false;
@@ -309,11 +327,19 @@ const resultClass = computed(() => {
   return resultMsg.value.includes("successful") ? "success" : "error";
 });
 
+const confirmPolicy = () => {
+  if (isSelected.value === true) {
+    showModal.value = true;
+  } else {
+    showPopupAlert.value = true;
+  }
+};
+
 const submitRegistration = async () => {
   loading.value = true;
   resultMsg.value = ""; // Clearing any previous messages
   try {
-    // console.log("Sending date:", formData.value);
+    console.log("Data:", formData.value);
     const response = await fetch("http://localhost:8080/api/v1/register", {
       method: "POST",
       headers: {
@@ -388,14 +414,8 @@ template {
   grid-template-columns: [l-e] 0.6fr [l-s] 1.2fr [r-s] 0.6fr [r-e];
 }
 
-.pol-log-container .policy-wrapper {
-  grid-column: l-s / r-s;
-  display: flex;
-  place-content: center;
-}
-
-.pol-log-container .policy-wrapper button {
-  justify-self: end;
+.pol-log-container button:nth-child(1) {
+  grid-column: r-s/r-e;
 }
 
 /* modal pop-up */
@@ -410,7 +430,6 @@ template {
   justify-content: center;
   align-items: center;
 }
-
 .modal-content {
   background-color: white;
   padding: 20px;

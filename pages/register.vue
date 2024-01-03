@@ -1,13 +1,13 @@
 <template>
   <title>ลงทะเบียน - SWU CLINIC</title>
-  <div class="p-reg flex flex-col justify-center items-center">
+  <div class="register-page flex flex-col justify-center items-center">
     <Banner />
     <RegistrationForm />
   </div>
 </template>
 
 <style>
-.p-reg {
+.register-page {
   min-height: 100svh;
 }
 </style>

@@ -101,7 +101,7 @@
     <!-- page 2 -->
     <div v-if="currStep === 2" class="flex flex-col gap-2">
       <label for="line">Line ID</label>
-      <input v-model="formData.LindId" type="text" id="lineId" required />
+      <input v-model="formData.lineId" type="text" id="lineId" required />
 
       <label for="email">อีเมล์</label>
       <input v-model="formData.email" type="email" id="email" required />
@@ -160,7 +160,7 @@
         :visible="showPopupAlert"
         @update:visible="showPopupAlert = $event"
       >
-        <div>
+        <div :class="{'text-green-500': isSelected}" >
           <h1>
             กรุณาอ่านตรวจสอบและยอมรับข้อกำหนดในการใช้งาน <br />(Please read,
             review and accept the terms of use.)
@@ -238,7 +238,8 @@ const router = useRouter();
 
 interface ResponseData {
   error?: string;
-  token?: string;
+  // token?: string;
+  otp: string;
 }
 
 const formData = ref({
@@ -248,7 +249,7 @@ const formData = ref({
   date_of_birth: "",
   phone: "",
   phoneOptional: "",
-  LindId: "",
+  lineId: "",
   email: "",
   gender: "",
 });
@@ -339,7 +340,7 @@ const submitRegistration = async () => {
   loading.value = true;
   resultMsg.value = ""; // Clearing any previous messages
   try {
-    console.log("Data:", formData.value);
+    // console.log("Data:", formData.value);
     const response = await fetch("http://localhost:8080/api/v1/register", {
       method: "POST",
       headers: {
@@ -349,24 +350,21 @@ const submitRegistration = async () => {
     });
 
     const responseData: ResponseData = await response.json();
-
     if (response.ok) {
-      if (responseData.token) {
+      if (responseData.otp) {
         resultMsg.value = "Registration successful";
-        navigateTo(`/medical-history/${responseData.token}`);
+        navigateTo(`/medical-history/${responseData.otp}`);
       } else {
-        resultMsg.value = "Registration failed no token found";
+        resultMsg.value = "Registration failed no otp found";
       }
 
       // console.log("Registration successful:", responseData);
     } else {
-      resultMsg.value = `Registration failed: ${
-        responseData.error || response.statusText
-      }`;
-      console.error(
-        "Registration failed:",
-        responseData.error || response.statusText
-      );
+      resultMsg.value = responseData.error || response.statusText;
+      // console.error(
+      //   "Registration failed:",
+      //   responseData.error || response.statusText
+      // );
     }
   } catch (error: any) {
     // Handle any other errors

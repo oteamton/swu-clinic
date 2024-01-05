@@ -238,7 +238,7 @@ const router = useRouter();
 
 interface ResponseData {
   error?: string;
-  // token?: string;
+  token?: string;
   otp: string;
 }
 
@@ -351,9 +351,9 @@ const submitRegistration = async () => {
 
     const responseData: ResponseData = await response.json();
     if (response.ok) {
-      if (responseData.otp) {
+      if (responseData.token) {
         resultMsg.value = "Registration successful";
-        navigateTo(`/medical-history/${responseData.otp}`);
+        navigateTo(`/medical-history/${responseData.token}`);
       } else {
         resultMsg.value = "Registration failed no otp found";
       }

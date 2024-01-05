@@ -307,8 +307,6 @@ import PainRating from "./PainRating.vue";
 
 const currStep = ref(1);
 const collapsed = ref(true);
-// const urlParams = new URLSearchParams(window.location.search);
-// const token = urlParams.get("token");
 
 const formData = ref({
   medicalHistory: "",
@@ -340,11 +338,6 @@ const nextStep = () => {
 function toggleCollapsed() {
   collapsed.value = !collapsed.value;
 }
-
-// if (!token) {
-//   // Handle missing token
-//   console.log("Missing token");
-// }
 
 const validateToken = async () => {
   // try {

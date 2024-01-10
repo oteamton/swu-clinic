@@ -15,9 +15,7 @@
       </div>
       <div class="card-body">
         <div class="row">
-          <template v-for="booking in filteredBookings" :key="booking.id">
-            <BookingCard :booking="booking" />
-          </template>
+          
         </div>
       </div>
     </div>
@@ -26,7 +24,6 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import BookingCard from "~/components/BookingCard.vue";
 type Booking = {
   id: string;
   name: string;

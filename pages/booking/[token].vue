@@ -32,6 +32,7 @@ setInterval(() => {
   currentDate.value = new Date();
 }, 1000);
 </script>
+
 <style>
 .booking-page {
   min-height: 100svh;

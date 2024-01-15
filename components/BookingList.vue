@@ -2,8 +2,8 @@
   <div class="list-container text-white">
     <h2 class="text-center">Select a Person for the Appointment</h2>
     <ul class="flex gap-1.5 flex-wrap justify-center">
-      <!-- <li
-        v-for="person in persons"
+      <li
+        v-for="person in providerData"
         class="mt-4 flex flex-col justify-center items-center border-2 rounded-md"
         :key="person.id"
         :class="{ selected: selectedPerson.current?.id === person.id }"
@@ -17,7 +17,7 @@
         >
           Select
         </button>
-      </li> -->
+      </li>
     </ul>
     <div class="conf-container w-full flex justify-center">
       <button class="border-2 border-color-white rounded-md mt-4 px-2 py-1">
@@ -34,9 +34,15 @@ interface PersonType {
   name: string;
   details: string;
 }
+
+interface ProviderResponse {
+  providers: PersonType[];
+}
+
+const providerData = ref<PersonType[]>([]);
 const currentDate = ref(new Date());
 const emit = defineEmits(["person-selected"]);
-const providerData = ref([]);
+
 const loading = ref(false);
 
 let selectedPerson = ref<{ current: PersonType | null }>({ current: null });
@@ -52,19 +58,21 @@ watch(selectedPerson, (newVal) => {
   }
 });
 
-// const getProviderData = async () => {
-//   try {
-//     const response = await fetch('http://localhost:8080/api/v1/providers', {
-//       method: 'GET',
-//     });
+const getProviderData = async () => {
+  loading.value = true;
+  try {
+    const response = await fetch("http://localhost:8080/api/v1/providers", {
+      method: "GET",
+    });
 
-//     const responseData: ResponseData = await response.json();
-//     if(response.ok){
-//       getProviderData.value = responseData
-//     }
-    
-//   } catch (error) {}
-// };
+    if (response.ok) {
+      const responseData: ProviderResponse = await response.json();
+      providerData.value = responseData.providers;
+    }
+  } catch (error) {}
+};
+
+getProviderData();
 </script>
 
 <style scoped>

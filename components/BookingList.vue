@@ -2,18 +2,27 @@
   <div class="list-container text-white">
     <h2 class="text-center">Select a Person for the Appointment</h2>
     <ul class="flex gap-1.5 flex-wrap justify-center">
-      <li v-for="person in persons" class="mt-4 flex flex-col justify-center items-center border-2 rounded-md"
-        :key="person.id" :class="{ selected: selectedPerson.current?.id === person.id }">
+      <!-- <li
+        v-for="person in persons"
+        class="mt-4 flex flex-col justify-center items-center border-2 rounded-md"
+        :key="person.id"
+        :class="{ selected: selectedPerson.current?.id === person.id }"
+      >
         <img :src="person.image" class="mt-2 mx-2 rounded-md" />
         <p class="mt-2">ชื่อ {{ person.name }}</p>
         <p>{{ person.details }}</p>
-        <button @click="selectPerson(person)" class="bg-blue-500 rounded-md active:scale-90 my-2 pb-0.5">
+        <button
+          @click="selectPerson(person)"
+          class="bg-blue-500 rounded-md active:scale-90 my-2 pb-0.5"
+        >
           Select
         </button>
-      </li>
+      </li> -->
     </ul>
     <div class="conf-container w-full flex justify-center">
-      <button class="border-2 border-color-white rounded-md mt-4 px-2 py-1">Confirm</button>
+      <button class="border-2 border-color-white rounded-md mt-4 px-2 py-1">
+        Confirm
+      </button>
     </div>
   </div>
 </template>
@@ -27,34 +36,8 @@ interface PersonType {
 }
 const currentDate = ref(new Date());
 const emit = defineEmits(["person-selected"]);
-
-const persons = ref([
-  // Sample data
-  {
-    id: 1,
-    image: "https://via.placeholder.com/150",
-    name: "Ton",
-    details: "Expert in prompt",
-  },
-  {
-    id: 2,
-    image: "https://via.placeholder.com/150",
-    name: "Kitch",
-    details: "Expert in prompt",
-  },
-  {
-    id: 3,
-    image: "https://via.placeholder.com/150",
-    name: "Kitch",
-    details: "Expert in prompt",
-  },
-  {
-    id: 4,
-    image: "https://via.placeholder.com/150",
-    name: "Kitch",
-    details: "Expert in prompt",
-  },
-]);
+const providerData = ref([]);
+const loading = ref(false);
 
 let selectedPerson = ref<{ current: PersonType | null }>({ current: null });
 
@@ -68,6 +51,20 @@ watch(selectedPerson, (newVal) => {
     console.log(`Selected person: ${newVal.current.name}`);
   }
 });
+
+// const getProviderData = async () => {
+//   try {
+//     const response = await fetch('http://localhost:8080/api/v1/providers', {
+//       method: 'GET',
+//     });
+
+//     const responseData: ResponseData = await response.json();
+//     if(response.ok){
+//       getProviderData.value = responseData
+//     }
+    
+//   } catch (error) {}
+// };
 </script>
 
 <style scoped>

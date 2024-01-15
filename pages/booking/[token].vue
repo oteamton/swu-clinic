@@ -4,11 +4,14 @@
     <Banner />
     <h2 class="text-white text-center">วันที่ {{ date }} เวลา {{ time }}</h2>
     <BookingList />
+    <UserPanel :token = "token" />
   </div>
 </template>
 
 <script setup lang="ts">
 const currentDate = ref(new Date());
+const routeParams = useRoute().params;
+const token = typeof routeParams.token === 'string' ? routeParams.token: '';
 
 const date = computed(() => {
   currentDate.value.toLocaleDateString();

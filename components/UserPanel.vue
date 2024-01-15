@@ -7,12 +7,12 @@
     ref="panel"
   >
     <div v-show="!isCollapsed" class="user-content">
-      <div class="user-info bg-pink-500">
-        <!-- <img src="https://via.placeholder.com/150" alt="User Avatar" class="avatar" /> -->
-        <h2>{{ user.name }} {{ user.surname }}</h2>
-        <p>{{ user.email }}</p>
-        <p>Born on {{ formattedDate }}</p>
-        <p>Phone: {{ user.phone }}</p>
+      <div class="user-info bg-pink-500 rounded-md">
+        <img src="https://via.placeholder.com/150" alt="User Avatar" class="avatar" />
+        <h2>{{ userData?.name }} {{ userData?.surname }}</h2>
+        <p>{{ userData?.email }}</p>
+        <p><span>Born on </span>{{ formattedDate }}</p>
+        <p><span>Phone: </span>{{ userData?.phone }}</p>
       </div>
 
       <div class="user-actions">
@@ -20,22 +20,25 @@
         <!-- Further user actions or features can be added here -->
       </div>
     </div>
+    <div class="toggle-area" @click="toggleCollapse"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-const user = ref({
-  name: "John",
-  surname: "Doe",
-  email: "john@example.com",
-  date_of_birth: "1990-01-01",
-  phone: "123-456-7890",
+const userData = ref();
+const message = ref("");
+const props = defineProps({
+  token: String,
 });
 const isCollapsed = ref(false);
 const panel = ref<HTMLElement | null>(null);
-
+const panelPosition = ref({ x: 0, y: 0 });
+let clickStartTime = 0;
+const checkThreshold = 200;
 const formattedDate = computed(() => {
-  return new Date(user.value.date_of_birth).toLocaleDateString();
+  return userData.value?.date_of_birth
+    ? new Date(userData.value.date_of_birth).toLocaleDateString()
+    : "";
 });
 
 const toggleCollapse = () => {
@@ -49,63 +52,106 @@ const logout = (event: Event) => {
 
 // Draggable functionality
 let startX = 0,
-  startY = 0;
+  startY = 0,
+  deltaX = 0,
+  deltaY = 0;
 let isDragging = false;
 
 const onMouseDown = (event: MouseEvent) => {
   isDragging = true;
-  startX = event.clientX - (panel.value?.offsetLeft || 0);
-  startY = event.clientY - (panel.value?.offsetTop || 0);
+  clickStartTime = event.timeStamp;
+  startX = event.clientX;
+  startY = event.clientY;
   document.addEventListener("mousemove", onMouseMove);
   document.addEventListener("mouseup", onMouseUp);
 };
 
 const onMouseMove = (event: MouseEvent) => {
-  if (!isDragging || !panel.value) return;
+  if (!isDragging) return;
 
-  let newX = event.clientX - startX;
-  let newY = event.clientY - startY;
+  deltaX = event.clientX - startX;
+  deltaY = event.clientY - startY;
 
-  // Check for the edges of the screen
-  newX = Math.min(
-    window.innerWidth - panel.value.offsetWidth,
-    Math.max(0, newX)
-  );
-  newY = Math.min(
-    window.innerHeight - panel.value.offsetHeight,
-    Math.max(0, newY)
-  );
+  panelPosition.value.x += deltaX;
+  panelPosition.value.y += deltaY;
 
-  panel.value.style.left = `${newX}px`;
-  panel.value.style.top = `${newY}px`;
+  if (panel.value) {
+    panel.value.style.transform = `translate(${panelPosition.value.x}px, ${panelPosition.value.y}px)`;
+  }
+
+  startX = event.clientX;
+  startY = event.clientY;
 };
 
-const onMouseUp = () => {
+const onMouseUp = (event: MouseEvent) => {
   isDragging = false;
+  const clickDuration = event.timeStamp - clickStartTime;
+
+  // Trigger collapse only if it's a click
+  if (clickDuration < checkThreshold) {
+    toggleCollapse();
+  }
+};
+
+onUnmounted(() => {
+  document.removeEventListener("mousemove", onMouseMove);
+  document.removeEventListener("mouseup", onMouseUp);
+});
+
+// Get user data
+const getUserData = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:8080/api/v1/user-medical-record",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${props.token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      userData.value = await response.json();
+      message.value = "User date fetched successfully.";
+    } else {
+      message.value = "Failed to fetch User date.";
+    }
+  } catch (error) {
+    // console.error('Error fetching medical data:', error);
+    message.value = "An error occurred while fetching medical data.";
+  }
 };
 
 onMounted(() => {
   if (panel.value) {
     panel.value.addEventListener("mousedown", onMouseDown);
   }
-});
-
-onUnmounted(() => {
-  document.removeEventListener("mousemove", onMouseMove);
-  document.removeEventListener("mouseup", onMouseUp);
+  getUserData();
 });
 </script>
 
 <style scoped>
 .user-panel {
-  width: 150px;
+  width: 160px;
   height: 250px;
   cursor: pointer;
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   border-radius: 10px;
   transition: all 0.3s ease;
+  will-change: transform;
+}
+
+.toggle-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  z-index: 10;
 }
 
 .user-panel.collapsed {
@@ -126,8 +172,13 @@ onUnmounted(() => {
 
 .user-info,
 .user-actions {
-  text-align: center;
+  text-align: start;
   transition: opacity 0.3s ease;
+}
+
+.user-info {
+  padding: 10px;
+  line-height: 1.2rem;
 }
 
 .collapse .user-info,

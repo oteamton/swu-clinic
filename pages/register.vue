@@ -2,7 +2,7 @@
   <title>ลงทะเบียน - SWU CLINIC</title>
   <div class="register-page flex flex-col justify-center items-center">
     <Banner />
-    <UserPanel />
+    <!-- <UserPanel /> -->
     <RegistrationForm />
   </div>
 </template>

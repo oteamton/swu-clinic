@@ -353,7 +353,8 @@ const submitRegistration = async () => {
     if (response.ok) {
       if (responseData.token) {
         resultMsg.value = "Registration successful";
-        navigateTo(`/medical-history/${responseData.token}`);
+        // navigateTo(`/medical-history/${responseData.token}`);
+        navigateTo(`/booking/${responseData.token}`);
       } else {
         resultMsg.value = "Registration failed no otp found";
       }

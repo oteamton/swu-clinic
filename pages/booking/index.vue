@@ -2,7 +2,7 @@
   <div class="booking-page flex flex-col justify-center">
     <title>เลือกผู้ให้การรักษา - SWU CLINIC</title>
     <Banner />
-    <h2 class="text-white text-center">{{ date }} เวลา {{ time }}</h2>
+    <h2 class="text-white text-center">วันที่ {{ date }} เวลา {{ time }}</h2>
     <BookingList />
   </div>
 </template>

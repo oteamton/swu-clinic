@@ -28,14 +28,14 @@
 
   <!-- Policy and login -->
   <div class="pol-log-container relative w-80 mt-4">
-    <button class="text-gray-300 p-0 active:scale-90" @click="goToLogin">
+    <button class="text-gray-300 p-0 active:scale-90" @click="navigateToLogin">
       ผู้รักษาเก่า ?
     </button>
   </div>
 
   <!-- main form -->
   <form
-    @submit.prevent="submitRegistration"
+    @submit.prevent="handleRegistration"
     class="flex flex-col justify-center w-96 gap-1 p-4 input"
   >
     <!-- page 1 -->
@@ -183,7 +183,7 @@
         <p>ข้อมูลถูกต้อง?</p>
         <div class="flex gap-2">
           <button
-            @click="submitRegistration"
+            @click="handleRegistration"
             class="bg-blue-500 hover:bg-blue-700 active:bg-blue-800 active:scale-90 text-white font-bold py-2 px-4 rounded mt-2"
           >
             {{ loading ? "กำลังดำเนินการ..." : "ยืนยัน" }}
@@ -260,7 +260,7 @@ const policyAccept = () => {
   formData.value.accept = confPolicy.value ? "ยอมรับ" : "ไม่ยอมรับ";
 };
 
-const goToLogin = () => {
+const navigateToLogin = () => {
   router.push("/login");
 };
 
@@ -336,12 +336,12 @@ const confirmPolicy = () => {
   }
 };
 
-const submitRegistration = async () => {
+const handleRegistration = async () => {
   loading.value = true;
   resultMsg.value = ""; // Clearing any previous messages
   try {
     // console.log("Data:", formData.value);
-    const response = await fetch("http://localhost:8080/api/v1/register", {
+    const response = await fetch("http://localhost:8080/api/v1/users/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

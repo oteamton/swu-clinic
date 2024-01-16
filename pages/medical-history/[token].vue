@@ -12,7 +12,7 @@ import { useRoute } from 'vue-router';
 
 const token = useRoute().params.token;
 const userData = ref(null);
-const message = ref('Click the button to fetch medical data.');
+const message = ref();
 
 const getUserData = async () => {
   try {

@@ -25,30 +25,45 @@
     </ul>
     <div class="conf-container w-full flex justify-center">
       <button
-      @click="handleBooking"
+        @click="showPopup = true"
         class="bg-blue-500 border-2 border-color-white active:scale-90 rounded-md mt-4 px-2 py-1"
       >
         ยืนยัน
       </button>
+      <Popup :visible="showPopup" @update:visible="showPopup = $event">
+        <Calendar
+          @dateSelected="
+            (date, time) => {
+              selectedDateTime.date = date;
+              selectedDateTime.time = time;
+            }
+          "
+          @closePopup="(showPopup = false), handleBooking()"
+        />
+      </Popup>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import Calendar from "./Calendar.vue";
 interface PersonType {
   id: number;
   // image: string;
   name: string;
   details: string;
 }
-
+const showPopup = ref(false);
 const isLoading = ref(false);
 let providerData = ref<PersonType[]>([]);
-const currentDate = ref(new Date());
+// const currentDate = ref(new Date());
 const emit = defineEmits(["person-selected"]);
 
 let selectedPerson = ref<{ current: PersonType | null }>({ current: null });
-
+let selectedDateTime = ref({
+  date: null,
+  time: null,
+});
 const selectPerson = (person: PersonType) => {
   selectedPerson.value.current = person;
   emit("person-selected", person);
@@ -83,9 +98,35 @@ const getProviderData = async () => {
 };
 
 const handleBooking = async () => {
-  // console.log(selectedPerson.value.current);
-  if (selectedPerson.value.current) {
+  const formatDateSql = (date: Date) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = (d.getMonth() + 1).toString().padStart(2, "0");
+  const day = d.getDate().toString().padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const sqlFormattedDate = selectedDateTime.value.date
+  ? formatDateSql(selectedDateTime.value.date)
+  : null;
+const sqlFormattedTime = `${selectedDateTime.value.time}:00`;
+  console.log(
+    selectedPerson.value.current?.id,
+    "Date format: ",
+    sqlFormattedDate,
+    "Time format: ",
+    sqlFormattedTime
+  );
+
+  if (
+    selectedPerson.value.current &&
+    selectedDateTime.value.date &&
+    selectedDateTime.value.time
+  ) {
     try {
+      let mockCustomerId = 1;
+      let mockStatus = '1';
       const response = await fetch(
         "http://localhost:8080/api/v1/services/booking",
         {
@@ -94,13 +135,23 @@ const handleBooking = async () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            selectedPerson: selectedPerson.value.current.id,
+            customerId: mockCustomerId,
+            selectedPersonId: selectedPerson.value.current.id,
+            date: sqlFormattedDate,
+            time: selectedDateTime.value.time,
+            statusService: mockStatus,
           }),
         }
       );
+
+      if (response.ok) {
+        alert("Booking successful");
+      }
     } catch (error) {
-      console.log(error);
+      console.log("Error submitting booking: ", error);
     }
+  } else {
+    alert("Please select a person, date, and time.");
   }
 };
 

@@ -45,9 +45,10 @@ const closePopup = () => {
   overflow-y: auto;
   widows: 90%;
   max-width: 500px;
+
 }
 
-.closeModal-btn-container{
+.closeModal-btn-container {
   direction: rtl !important;
 }
 

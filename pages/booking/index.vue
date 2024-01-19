@@ -4,7 +4,7 @@
     <Banner />
     <h2 class="text-white text-center">วันที่ {{ date }} เวลา {{ time }}</h2>
     <BookingList />
-    <UserPanel :token="token" />
+    <!-- <UserPanel :token="token" /> -->
   </div>
 </template>
 

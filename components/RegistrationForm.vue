@@ -199,15 +199,15 @@
       </div>
     </div>
 
-    <div v-if="resultMsg" class="overlay">
+    <div v-if="resultMessage" class="overlay">
       <div
-        v-if="resultMsg"
+        v-if="resultMessage"
         :class="['result-box', resultClass]"
         class="flex items-center gap-2"
       >
-        {{ resultMsg }}
+        {{ resultMessage }}
         <button
-          @click="resultMsg = ''"
+          @click="resultMessage = ''"
           class="close-btn-parent bg-slate-300 active:scale-90"
         >
           ✕
@@ -229,7 +229,7 @@ const showModal = ref(false); // for ensure subbmitting
 const showPopup = ref(false); // for display privacy policy
 const showPopupAlert = ref(false); // Alert for checking pp box
 const confPolicy = ref(false); // checkbox in privacy policy
-const resultMsg = ref("");
+const resultMessage = ref("");
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 const nameRegex = /^[A-Za-z\u0E00-\u0E7F]+$/;
 const phoneRegex = /^[0-9]+$/;
@@ -239,7 +239,6 @@ const router = useRouter();
 interface ResponseData {
   error?: string;
   token?: string;
-  otp: string;
 }
 
 const formData = ref({
@@ -325,7 +324,7 @@ const isSelected = computed(() => confPolicy.value);
 // console.log(firstStepValid.value)
 
 const resultClass = computed(() => {
-  return resultMsg.value.includes("successful") ? "success" : "error";
+  return resultMessage.value.includes("successful") ? "success" : "error";
 });
 
 const confirmPolicy = () => {
@@ -338,7 +337,7 @@ const confirmPolicy = () => {
 
 const handleRegistration = async () => {
   loading.value = true;
-  resultMsg.value = ""; // Clearing any previous messages
+  resultMessage.value = ""; // Clearing any previous messages
   try {
     // console.log("Data:", formData.value);
     const response = await fetch("http://localhost:8080/api/v1/users/register", {
@@ -350,26 +349,22 @@ const handleRegistration = async () => {
     });
 
     const responseData: ResponseData = await response.json();
+
     if (response.ok) {
-      if (responseData.token) {
-        resultMsg.value = "Registration successful";
-        // navigateTo(`/medical-history/${responseData.token}`);
-        navigateTo(`/booking/${responseData.token}`);
+      if (response.status === 200) {
+        resultMessage.value = "Registration successful";
+        navigateTo(`/login`);
       } else {
-        resultMsg.value = "Registration failed no otp found";
+        resultMessage.value = "Registration failed no otp found";
       }
 
-      // console.log("Registration successful:", responseData);
     } else {
-      resultMsg.value = responseData.error || response.statusText;
-      // console.error(
-      //   "Registration failed:",
-      //   responseData.error || response.statusText
-      // );
+      resultMessage.value = responseData.error || response.statusText;
+     
     }
   } catch (error: any) {
     // Handle any other errors
-    resultMsg.value = error.message;
+    resultMessage.value = error.message;
     // console.error("Registration failed:", error.message);
   } finally {
     loading.value = false;

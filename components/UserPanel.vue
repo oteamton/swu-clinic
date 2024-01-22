@@ -15,7 +15,7 @@
           class="avatar"
         />
         <h2>{{ userData?.name }} {{ userData?.surname }}</h2>
-        <!-- <p>{{ userData?.email }}</p> -->
+        <!-- <p>{{ userData?.cardId }}</p> -->
         <p><span>Born on </span>{{ formattedDate }}</p>
         <p><span>Phone: </span>{{ userData?.phone }}</p>
       </div>
@@ -36,7 +36,6 @@ const panelPosition = ref({ x: 0, y: 0 });
 let clickStartTime = 0;
 const checkThreshold = 200;
 
-// Draggable functionality
 let startX = 0,
   startY = 0,
   deltaX = 0,
@@ -46,6 +45,7 @@ let isDragging = false;
 const props = defineProps({
   token: String,
 });
+
 const formattedDate = computed(() => {
   return userData.value?.date_of_birth
     ? new Date(userData.value.date_of_birth).toLocaleDateString()
@@ -112,12 +112,12 @@ const getUserData = async () => {
       "http://localhost:8080/api/v1/users/get-user-data",
       {
         method: "GET",
-        // headers: {
-        //   Authorization: `Bearer ${props.token}`,
-        // },
+        headers: {
+          Authorization: `Bearer ${props.token}`,
+        },
       }
     );
-
+    
     if (response.ok) {
       userData.value = await response.json();
       message.value = "User date fetched successfully.";

@@ -80,6 +80,7 @@
         id="date_of_birth"
         required
       />
+      <p class="text-white">อายุ(Age): {{ userAge }}</p>
       <span class="text-orange-300" v-if="!isDateofBirthSelected"
         >Please select a date</span
       >
@@ -109,13 +110,18 @@
         >Please enter valid email</span
       >
       <label for="phone">เบอร์โทรศัพท์</label>
-      <input v-model="formData.phone" type="text" id="phone" required />
+      <input v-model="formData.phone" type="text" id="phone" :maxlength="10" required />
       <span class="text-orange-300" v-if="!isPhoneValid"
         >Please enter valid phone</span
       >
+      <label for="cardId">รหัสบัตรประชาชน</label>
+      <input v-model="formData.cardId" type="text" id="cardId" :maxlength="13" required />
+      <span class="text-orange-300" v-if="!isCardIdValid"
+        >Please enter valid card id</span
+      >
 
       <label>เบอร์โทรศัพท์บุคคลใกล้ตัว</label>
-      <input v-model="formData.phoneOptional" type="text" id="phone" />
+      <input v-model="formData.phoneOptional" type="text" id="phone" :maxlength="10"/>
       <!-- <span class="text-orange-300" v-if="!isPhoneValid"
         >Please enter valid phone</span
       > -->
@@ -160,7 +166,7 @@
         :visible="showPopupAlert"
         @update:visible="showPopupAlert = $event"
       >
-        <div :class="{'text-green-500': isSelected}" >
+        <div :class="{ 'text-green-500': isSelected }">
           <h1>
             กรุณาอ่านตรวจสอบและยอมรับข้อกำหนดในการใช้งาน <br />(Please read,
             review and accept the terms of use.)
@@ -220,6 +226,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { fetchApi } from "~/utils/apiUtils";
 import Popup from "./Popup.vue";
 import PrivacyPolicy from "./PrivacyPolicy.vue";
 
@@ -233,6 +240,7 @@ const resultMessage = ref("");
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 const nameRegex = /^[A-Za-z\u0E00-\u0E7F]+$/;
 const phoneRegex = /^[0-9]+$/;
+const cardIdRegex = /^[0-9]{13}$/;
 // const addressRegex = /^[A-Za-z\u0E00-\u0E7F0-9\s]+$/;
 const router = useRouter();
 
@@ -247,6 +255,7 @@ const formData = ref({
   surname: "",
   date_of_birth: "",
   phone: "",
+  cardId: "",
   phoneOptional: "",
   lineId: "",
   email: "",
@@ -292,6 +301,10 @@ const isDateofBirthSelected = computed(() => {
   return formData.value.date_of_birth !== "";
 });
 
+const isCardIdValid = computed(() => {
+  return cardIdRegex.test(formData.value.cardId)
+})
+
 const isPhoneValid = computed(() => {
   return (
     phoneRegex.test(formData.value.phone) && formData.value.phone.length == 10
@@ -327,6 +340,28 @@ const resultClass = computed(() => {
   return resultMessage.value.includes("successful") ? "success" : "error";
 });
 
+const userAge = computed(() => {
+  const today = new Date();
+  const birthDate = new Date(formData.value.date_of_birth);
+
+  let years = today.getFullYear() - birthDate.getFullYear();
+  let months = today.getMonth() - birthDate.getMonth();
+  let days = today.getDay() - birthDate.getDay();
+
+  // if (months < 0 || (months === 0 && days < 0)){
+  //   years--;
+  //   months = 12+ months;
+  // }
+
+  // if(days < 0){
+  //   months--;
+  //   const lastDayOfPrevMonth = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+  //   days = lastDayOfPrevMonth + days;
+  // }
+
+  return `${years} ปี ${months} เดือน ${days} วัน`;
+});
+
 const confirmPolicy = () => {
   if (isSelected.value === true) {
     showModal.value = true;
@@ -339,14 +374,17 @@ const handleRegistration = async () => {
   loading.value = true;
   resultMessage.value = ""; // Clearing any previous messages
   try {
-    // console.log("Data:", formData.value);
-    const response = await fetch("http://localhost:8080/api/v1/users/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData.value),
-    });
+    console.log("Data:", formData.value);
+    const response = await fetch(
+      "http://localhost:8080/api/v1/users/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData.value),
+      }
+    );
 
     const responseData: ResponseData = await response.json();
 
@@ -357,10 +395,8 @@ const handleRegistration = async () => {
       } else {
         resultMessage.value = "Registration failed no otp found";
       }
-
     } else {
       resultMessage.value = responseData.error || response.statusText;
-     
     }
   } catch (error: any) {
     // Handle any other errors

@@ -23,10 +23,10 @@
         </button>
       </li>
     </ul>
-    <div class="conf-container w-full flex justify-center">
+    <div class="confirm-container w-full flex justify-center gap-2">
       <button
         @click="showPopup = true"
-        class="bg-blue-500 border-2 border-color-white active:scale-90 rounded-md mt-4 px-2 py-1"
+        class="bg-blue-500 active:scale-90 rounded-md mt-4 px-2 py-1"
       >
         ยืนยัน
       </button>
@@ -41,18 +41,29 @@
           @closePopup="(showPopup = false), handleBooking()"
         />
       </Popup>
+      <button
+        @click="logout"
+        class="bg-red-500 active:scale-90 rounded-md mt-4 px-2 py-1"
+      >
+        ยกเลิก
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import Calendar from "./Calendar.vue";
+
 interface PersonType {
   id: number;
   // image: string;
   name: string;
   details: string;
 }
+const userData = ref();
+const props = defineProps({
+  token: String,
+});
 const showPopup = ref(false);
 const isLoading = ref(false);
 let providerData = ref<PersonType[]>([]);
@@ -69,6 +80,11 @@ const selectPerson = (person: PersonType) => {
   emit("person-selected", person);
 };
 
+const logout = () => {
+  localStorage.removeItem('token');
+  useRouter().push("/login");
+};
+
 watch(selectedPerson, (newVal) => {
   if (newVal.current) {
     // console.log(`Selected person: ${newVal.current.name}`);
@@ -78,18 +94,15 @@ watch(selectedPerson, (newVal) => {
 const getProviderData = async () => {
   isLoading.value = true;
   try {
-    const response = await fetch(
+    const data = await fetch(
       "http://localhost:8080/api/v1/services/providers",
       {
         method: "GET",
       }
     );
 
-    if (response.ok) {
-      const responseData = await response.json();
-      providerData.value = responseData.providers;
-      // console.log("Data: ", responseData);
-    }
+    providerData.value = await data.json();
+
   } catch (error) {
     console.error("Error fetching provider data:", error);
   } finally {
@@ -97,20 +110,37 @@ const getProviderData = async () => {
   }
 };
 
-const handleBooking = async () => {
-  const formatDateSql = (date: Date) => {
-  const d = new Date(date);
-  const year = d.getFullYear();
-  const month = (d.getMonth() + 1).toString().padStart(2, "0");
-  const day = d.getDate().toString().padStart(2, "0");
+const getUserData = async () => {
+  if (!props.token) return;
+  try {
+    const data = await fetch(
+      "http://localhost:8080/api/v1/users/get-user-data",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${props.token}`,
+        },
+      }
+    );
 
-  return `${year}-${month}-${day}`;
+    userData.value = data;
+  } catch (error) {}
 };
 
-const sqlFormattedDate = selectedDateTime.value.date
-  ? formatDateSql(selectedDateTime.value.date)
-  : null;
-const sqlFormattedTime = `${selectedDateTime.value.time}:00`;
+const handleBooking = async () => {
+  const formatDateSql = (date: Date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, "0");
+    const day = d.getDate().toString().padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const sqlFormattedDate = selectedDateTime.value.date
+    ? formatDateSql(selectedDateTime.value.date)
+    : null;
+  const sqlFormattedTime = `${selectedDateTime.value.time}:00`;
   console.log(
     selectedPerson.value.current?.id,
     "Date format: ",
@@ -126,7 +156,7 @@ const sqlFormattedTime = `${selectedDateTime.value.time}:00`;
   ) {
     try {
       let mockCustomerId = 1;
-      let mockStatus = '1';
+      let mockStatus = "1";
       const response = await fetch(
         "http://localhost:8080/api/v1/services/booking",
         {
@@ -155,7 +185,10 @@ const sqlFormattedTime = `${selectedDateTime.value.time}:00`;
   }
 };
 
-getProviderData();
+onMounted(() => {
+  getUserData();
+  getProviderData();
+});
 </script>
 
 <style scoped>
@@ -180,6 +213,10 @@ ul li button {
   border-color: rgb(252, 123, 145);
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   background-color: pink;
+}
+
+.confirm-container button:nth-child(n) {
+  min-width: 60px;
 }
 
 .conf-btn {

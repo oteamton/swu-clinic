@@ -14,13 +14,14 @@
         @click="submitLogin"
         class="py-2 px-4 rounded bg-blue-500 active:bg-blue-800 active:scale-90"
       >
-        Login
+        เข้าสู่ระบบ
       </button>
     </div>
   </form>
 </template>
 
 <script setup lang="ts">
+import { fetchApi } from "~/utils/apiUtils";
 const loading = ref(false);
 const resultMessage = ref("");
 

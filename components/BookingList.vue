@@ -81,7 +81,7 @@ const selectPerson = (person: PersonType) => {
 };
 
 const logout = () => {
-  localStorage.removeItem('token');
+  localStorage.removeItem("token");
   useRouter().push("/login");
 };
 
@@ -102,7 +102,6 @@ const getProviderData = async () => {
     );
 
     providerData.value = await data.json();
-
   } catch (error) {
     console.error("Error fetching provider data:", error);
   } finally {

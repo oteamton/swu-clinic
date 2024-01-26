@@ -80,7 +80,7 @@
         id="date_of_birth"
         required
       />
-      <p class="text-white">อายุ(Age): {{ userAge }}</p>
+      <!-- <p class="text-white">อายุ(Age): {{ userAge }}</p> -->
       <span class="text-orange-300" v-if="!isDateofBirthSelected"
         >Please select a date</span
       >

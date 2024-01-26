@@ -110,18 +110,35 @@
         >Please enter valid email</span
       >
       <label for="phone">เบอร์โทรศัพท์</label>
-      <input v-model="formData.phone" type="text" id="phone" :maxlength="10" required />
+      <input
+        v-model="formData.phone"
+        type="text"
+        id="phone"
+        :maxlength="10"
+        required
+      />
       <span class="text-orange-300" v-if="!isPhoneValid"
         >Please enter valid phone</span
       >
       <label for="cardId">รหัสบัตรประชาชน</label>
-      <input v-model="formData.cardId" type="text" id="cardId" :maxlength="13" required />
+      <input
+        v-model="formData.cardId"
+        type="text"
+        id="cardId"
+        :maxlength="13"
+        required
+      />
       <span class="text-orange-300" v-if="!isCardIdValid"
         >Please enter valid card id</span
       >
 
       <label>เบอร์โทรศัพท์บุคคลใกล้ตัว</label>
-      <input v-model="formData.phoneOptional" type="text" id="phone" :maxlength="10"/>
+      <input
+        v-model="formData.phoneOptional"
+        type="text"
+        id="phone"
+        :maxlength="10"
+      />
       <!-- <span class="text-orange-300" v-if="!isPhoneValid"
         >Please enter valid phone</span
       > -->
@@ -302,8 +319,8 @@ const isDateofBirthSelected = computed(() => {
 });
 
 const isCardIdValid = computed(() => {
-  return cardIdRegex.test(formData.value.cardId)
-})
+  return cardIdRegex.test(formData.value.cardId);
+});
 
 const isPhoneValid = computed(() => {
   return (
@@ -340,27 +357,27 @@ const resultClass = computed(() => {
   return resultMessage.value.includes("successful") ? "success" : "error";
 });
 
-const userAge = computed(() => {
-  const today = new Date();
-  const birthDate = new Date(formData.value.date_of_birth);
+// const userAge = computed(() => {
+//   const today = new Date();
+//   const birthDate = new Date(formData.value.date_of_birth);
 
-  let years = today.getFullYear() - birthDate.getFullYear();
-  let months = today.getMonth() - birthDate.getMonth();
-  let days = today.getDay() - birthDate.getDay();
+//   let years = today.getFullYear() - birthDate.getFullYear();
+//   let months = today.getMonth() - birthDate.getMonth();
+//   let days = today.getDay() - birthDate.getDay();
 
-  // if (months < 0 || (months === 0 && days < 0)){
-  //   years--;
-  //   months = 12+ months;
-  // }
+// if (months < 0 || (months === 0 && days < 0)){
+//   years--;
+//   months = 12+ months;
+// }
 
-  // if(days < 0){
-  //   months--;
-  //   const lastDayOfPrevMonth = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
-  //   days = lastDayOfPrevMonth + days;
-  // }
+// if(days < 0){
+//   months--;
+//   const lastDayOfPrevMonth = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+//   days = lastDayOfPrevMonth + days;
+// }
 
-  return `${years} ปี ${months} เดือน ${days} วัน`;
-});
+// return `${years} ปี ${months} เดือน ${days} วัน`;
+// });
 
 const confirmPolicy = () => {
   if (isSelected.value === true) {
@@ -374,7 +391,6 @@ const handleRegistration = async () => {
   loading.value = true;
   resultMessage.value = ""; // Clearing any previous messages
   try {
-    console.log("Data:", formData.value);
     const response = await fetch(
       "http://localhost:8080/api/v1/users/register",
       {
@@ -389,12 +405,8 @@ const handleRegistration = async () => {
     const responseData: ResponseData = await response.json();
 
     if (response.ok) {
-      if (response.status === 200) {
-        resultMessage.value = "Registration successful";
-        navigateTo(`/login`);
-      } else {
-        resultMessage.value = "Registration failed no otp found";
-      }
+      resultMessage.value = "Registration successful";
+      navigateTo(`/login`);
     } else {
       resultMessage.value = responseData.error || response.statusText;
     }

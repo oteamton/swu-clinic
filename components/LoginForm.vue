@@ -1,29 +1,56 @@
 <template>
   <h2 class="text-4xl text-center mb-4 text-white">เข้าสู่การจอง</h2>
-  <form @submit.prevent="submitLogin">
+  <form
+    class="flex flex-col justify-center items-center"
+    @submit.prevent="submitLogin"
+  >
     <div class="flex flex-col justify-center w-96 gap-2 p-4 text-white">
       <label for="phone">หมายเลขโทรศัพท์ (Phone number)</label>
-      <input type="text" id="phone" v-model.trim="login.phone" />
+      <input
+        type="text"
+        id="phone"
+        v-model.trim="login.phone"
+        :maxlength="10"
+      />
 
       <label for="cardId">รหัสบัตรประชาชน (Card ID)</label>
-      <input type="text" id="cardId" v-model.trim="login.cardId" />
+      <input
+        type="text"
+        id="cardId"
+        v-model.trim="login.cardId"
+        :maxlength="13"
+      />
     </div>
 
     <div class="text-white login-btn-container">
       <button
         @click="submitLogin"
-        class="py-2 px-4 rounded bg-blue-500 active:bg-blue-800 active:scale-90"
+        :disabled="isFilled === false"
+        class="py-2 px-4 mb-4 rounded"
+        :class="{
+          'bg-blue-500': isFilled,
+          'bg-gray-500': !isFilled,
+          'active:bg-blue-800': isFilled,
+          'active:scale-90': isFilled,
+        }"
       >
         เข้าสู่ระบบ
       </button>
+    </div>
+
+    <div class="text-center text-xl" :class="{ 'text-red-500': resultMessage }">
+      <span v-if="loading" class="loading-indicator text-white"
+        >Loading. . .</span
+      >
+      {{ resultMessage }}
     </div>
   </form>
 </template>
 
 <script setup lang="ts">
-import { fetchApi } from "~/utils/apiUtils";
 const loading = ref(false);
 const resultMessage = ref("");
+const isFilled = ref(false);
 
 interface ResponseData {
   error?: string;
@@ -33,6 +60,15 @@ interface ResponseData {
 const login = ref({
   phone: "",
   cardId: "",
+});
+
+const isFieldFilled = () => {
+  isFilled.value =
+    login.value.phone.trim() !== "" && login.value.cardId.trim() !== "";
+};
+
+watchEffect(() => {
+  isFieldFilled();
 });
 
 const submitLogin = async () => {
@@ -48,16 +84,15 @@ const submitLogin = async () => {
     });
 
     const responseData: ResponseData = await response.json();
-
     if (response.ok) {
-      if (responseData.token) {
-        navigateTo(`/booking/${responseData.token}`);
-      } else {
-        resultMessage.value = "Registration failed no otp found";
-      }
+      sessionStorage.setItem("token", responseData.token as string);
+      navigateTo(`/booking/${responseData.token}`);
+    } else {
+      resultMessage.value =
+        "Login failed, Please check phone number or card ID.";
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   } finally {
     loading.value = false;
   }

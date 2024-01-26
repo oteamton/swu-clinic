@@ -81,7 +81,7 @@ const selectPerson = (person: PersonType) => {
 };
 
 const logout = () => {
-  localStorage.removeItem("token");
+  sessionStorage.removeItem("token");
   useRouter().push("/login");
 };
 
@@ -94,14 +94,19 @@ watch(selectedPerson, (newVal) => {
 const getProviderData = async () => {
   isLoading.value = true;
   try {
-    const data = await fetch(
+    const response = await fetch(
       "http://localhost:8080/api/v1/services/providers",
       {
         method: "GET",
       }
     );
 
-    providerData.value = await data.json();
+    if (response.ok) {
+      providerData.value = await response.json();
+      console.log(providerData.value);
+    } else {
+      console.error("Error fetching: ", response.statusText);
+    }
   } catch (error) {
     console.error("Error fetching provider data:", error);
   } finally {
@@ -140,13 +145,6 @@ const handleBooking = async () => {
     ? formatDateSql(selectedDateTime.value.date)
     : null;
   const sqlFormattedTime = `${selectedDateTime.value.time}:00`;
-  console.log(
-    selectedPerson.value.current?.id,
-    "Date format: ",
-    sqlFormattedDate,
-    "Time format: ",
-    sqlFormattedTime
-  );
 
   if (
     selectedPerson.value.current &&
@@ -177,7 +175,7 @@ const handleBooking = async () => {
         alert("Booking successful");
       }
     } catch (error) {
-      console.log("Error submitting booking: ", error);
+      console.error("Error submitting booking: ", error);
     }
   } else {
     alert("Please select a person, date, and time.");

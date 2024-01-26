@@ -3,15 +3,14 @@
     <title>เลือกผู้ให้การรักษา - SWU CLINIC</title>
     <Banner />
     <h2 class="text-white text-center">วันที่ {{ date }} เวลา {{ time }}</h2>
-    <BookingList :token="token" />
+    <BookingList  />
   </div>
 </template>
 
 <script setup lang="ts">
-const currentDate = ref(new Date());
-const routeParams = useRoute().params;
-const token = typeof routeParams.token === "string" ? routeParams.token : "";
+import jwt_decode from 'jwt-decode';
 
+const currentDate = ref(new Date());
 const date = computed(() => {
   currentDate.value.toLocaleDateString();
   const yy = currentDate.value.getFullYear().toString().padStart(4, "0");
@@ -26,6 +25,17 @@ const time = computed(() => {
   const seconds = currentDate.value.getSeconds().toString().padStart(2, "0");
   return `${hours}:${minutes}:${seconds}`;
 });
+
+// let userId: any = null;
+// try{
+//   const token = sessionStorage.getItem('token');
+//   if(token){
+//     const decoded = jwt_decode(token);
+//     userId = decoded.userId;
+//   }
+// } catch(error){
+
+// }
 
 setInterval(() => {
   currentDate.value = new Date();
